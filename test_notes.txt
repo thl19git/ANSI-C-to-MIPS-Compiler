@@ -1,0 +1,112 @@
+Array
+    declare_global (10)
+    declare_local (11)
+    index_constant (12)
+    index_expression (12)
+    index_variable (12)
+
+Control Flow
+    for_multiple (9)
+    for_one (9)
+    for_zero_v1 (9)
+    for_zero_v2 (9)
+    if_else_false (5)
+    if_else_true (5)
+    if_false (5)
+    if_true (5)
+    sequence (4)
+    while_multiple (6)
+    while_once (6)
+    while_zero (6)
+
+Default
+    test_ADD0 (4)
+    test_ADD1 (4)
+    test_CALL (7)
+    test_LOCAL (1, 2, 3)
+    test_RETURN (1, 2)
+
+Float
+    add_double (4, 17)
+    add_mul (4, 17)
+    add (4, 17)
+    mul_add (4, 17)
+    mul_double (4, 17)
+    mul (4, 17)
+    pow (4, 17)
+
+Functions
+    call_constant_external (18)
+    call_constant_internal (7)
+    call_five_args_external (18, 19)
+    call_five_args_internal (7, 19)
+    call_identity_external (18)
+    call_identity_internal (7)
+    call_mutual_recursive (20)
+    call_recursive_internal (13)
+    call_two_args_external (18)
+    call_two_args_internal (7)
+
+Integer
+    add (4)
+    bitwise_and (4)
+    bitwise_or (4)
+    bitwise_xor (4)
+    div (4)
+    equal (4)
+    less_than (4)
+    less_than_equal (4)
+    logical_and (4)
+    logical_or (4)
+    mul (4)
+    sub (4)
+
+Local Variable
+    constant_initialiser (2, 3)
+    dual_var (2, 3)
+    expression_initialiser (2, 3, 4)
+    identity (8)
+    return_constant (1)
+    scoped_var (21)
+    single_var (2, 3)
+
+Misc
+    enum1 (14)
+    enum2 (14)
+    switch1 (15)
+    switch2 (15, 16)
+    typedef1 (22)
+    typedef2 (22)
+
+Pointer
+    addressof (24)
+    arithmetic (26)
+    assign (24, 25)
+    dereferenece (25)
+    index (25, 26)
+
+Programs
+    fibonacci (4, 5, 13)
+    multiply (4, 6, 13)
+    sqrt (4, 5, 6, 13)
+
+Strings
+    chliteral (27)
+    escaped (27)
+    literal (28)
+    puts (28)
+    search (28)
+
+Struct
+    sizeof (23, 29)
+    struct_inst (29)
+    struct_member_get (29)
+    struct_member_set (29)
+    struct_two_members (29)
+
+Types
+    sizeof_char_inst (17, 23)
+    sizeof_char_type (17, 23)
+    sizeof_int_inst (2, 23)
+    sizeof_int_type (2, 23)
+    unsigned (17)
