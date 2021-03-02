@@ -7,8 +7,9 @@
 
 /* Bring in our declarations for token types and
    the yylval variable. */
-#include "compiler.hpp"
 #include <stdlib.h>
+#include "parser_test.tab.hpp"
+#include <string>
 std::string* wordT = new std::string;
 
 // This is to work around an irritating bug in Flex
@@ -75,8 +76,8 @@ return          { /*fprintf(stderr, "return keyword : %s\n", yytext);*/  return 
 
 
 
-[_a-zA-Z][_a-zA-Z0-9]*          { *wordT = yytext ; yylval.wordValue=wordT;  return T_IDENTIFIER; }
-[0-9]+							{ yylval.numberValue=strtod(yytext,0);  return T_INT_CONST; }
+[_a-zA-Z][_a-zA-Z0-9]*          { yylval.string=new std::string(yytext);  return T_IDENTIFIER; }
+[0-9]+							{ yylval.number=strtod(yytext,0);  return T_INT_CONST; }
 
 \n              { /*fprintf(stderr, "Newline\n");*/ }
 .				{ /*fprintf(stderr, "Unsupported character\n");*/}
@@ -85,7 +86,7 @@ return          { /*fprintf(stderr, "return keyword : %s\n", yytext);*/  return 
 /* Error handler. This will get called if none of the rules match. */
 void yyerror (char const *s)
 {
-  fprintf (stderr, "Flex Error: %s\n", s); /* s is the text that wasn't matched */
+  fprintf (stderr, "Parse Error: %s\n", s); /* s is the text that wasn't matched */
   exit(1);
 }
 //
