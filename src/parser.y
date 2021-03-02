@@ -1,5 +1,4 @@
-/*So far covers all expressions / structures in the basic feature set bar variable 
-  declaration and initialisation. Precedence and associativity is encoded in the
+/*So far covers all expressions / structures in the basic feature set. Precedence and associativity is encoded in the
   grammar. */
 
 %code requires{
@@ -40,6 +39,43 @@ FunctionDefinition:     TypeSpecifier T_IDENTIFIER T_LB T_RB CompoundStatement {
 
 CompoundStatement:      T_LCB T_RCB {;}
                         | T_LCB StatementList T_RCB {;}
+                        | T_LCB DeclarationList T_RCB {;}
+                        | T_LCB DeclarationList StatementList T_RCB {;}
+                        ;
+
+DeclarationList:        Declaration {;}
+                        | DeclarationList Declaration {;}
+                        ;
+
+Declaration:            DeclarationSpecifiers T_SEMICOLON {;}
+                        | DeclarationSpecifiers InitDeclaratorList T_SEMICOLON {;}
+                        ;
+
+DeclarationSpecifiers:  TypeSpecifier {;}
+                        | TypeSpecifier DeclarationSpecifiers {;}
+                        ;
+
+InitDeclaratorList:     InitDeclarator {;}
+                        | InitDeclaratorList T_COMMA InitDeclarator {;}
+                        ;
+
+InitDeclarator:         Declarator {;}
+                        | Declarator T_EQUAL Initializer {;}
+                        ;
+
+Declarator:             DirectDeclarator {;}
+                        ;
+
+DirectDeclarator:       T_IDENTIFIER {;}
+                        ;
+
+Initializer:            AssignmentExpression {;}
+                        | T_LCB InitializerList T_RCB {;}
+                        | T_LCB InitializerList T_COMMA T_RCB {;}
+                        ;
+
+InitializerList:        Initializer {;}
+                        | InitializerList T_COMMA Initializer {;}
                         ;
 
 StatementList:          Statement {;}
