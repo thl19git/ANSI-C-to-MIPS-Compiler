@@ -39,7 +39,7 @@ TranslationUnit:        // e.g. int foo() {...}
                         ;
                 
 FunctionDefinition:     // e.g. int foo() {...}
-                        DeclarationSpecifiers Declarator CompoundStatement {;}
+                        TypeSpecifier Declarator CompoundStatement {;}
                         | Declarator CompoundStatement {;}
                         ;
 
