@@ -34,145 +34,176 @@
 ROOT: TranslationUnit {;}
       ;
 
-TranslationUnit:        FunctionDefinition {;}
+TranslationUnit:        // e.g. int foo() {...}
+                        FunctionDefinition {;}
                         ;
                 
-FunctionDefinition:     TypeSpecifier T_IDENTIFIER T_LB T_RB CompoundStatement {;}
+FunctionDefinition:     // e.g. int foo() {...}
+                        DeclarationSpecifiers Declarator CompoundStatement {;}
+                        | Declarator CompoundStatement {;}
                         ;
 
-CompoundStatement:      T_LCB T_RCB {;}
+CompoundStatement:      // e.g. {int x = 5; return x + 3;}
+                        T_LCB T_RCB {;}
                         | T_LCB StatementList T_RCB {;}
                         | T_LCB DeclarationList T_RCB {;}
                         | T_LCB DeclarationList StatementList T_RCB {;}
                         ;
 
-DeclarationList:        Declaration {;}
+DeclarationList:        // e.g. int x; int y = 5;
+                        Declaration {;}
                         | DeclarationList Declaration {;}
                         ;
 
-Declaration:            DeclarationSpecifiers T_SEMICOLON {;}
-                        | DeclarationSpecifiers InitDeclaratorList T_SEMICOLON {;}
+Declaration:            // e.g int x; || int x = 5;
+                        TypeSpecifier InitDeclaratorList T_SEMICOLON {;}
                         ;
 
-DeclarationSpecifiers:  TypeSpecifier {;}
-                        | TypeSpecifier DeclarationSpecifiers {;}
-                        ;
 
-InitDeclaratorList:     InitDeclarator {;}
+InitDeclaratorList:     // e.g. x; || x , y || int a = 1, b = 2
+                        InitDeclarator {;}
                         | InitDeclaratorList T_COMMA InitDeclarator {;}
                         ;
 
-InitDeclarator:         Declarator {;}
+InitDeclarator:         // e.g. a || a = 1
+                        Declarator {;}
                         | Declarator T_EQUAL Initializer {;}
                         ;
 
-Declarator:             DirectDeclarator {;}
+Declarator:             // e.g. a || sum
+                        DirectDeclarator {;}
                         ;
 
-DirectDeclarator:       T_IDENTIFIER {;}
+DirectDeclarator:       // e.g. a || sum
+                        T_IDENTIFIER {;}
+                        | T_LB Declarator T_RB {;}
+                        | DirectDeclarator T_LB T_RB {;}
                         ;
 
-Initializer:            AssignmentExpression {;}
+Initializer:            // e.g. a || b = 2
+                        AssignmentExpression {;}
                         | T_LCB InitializerList T_RCB {;}
                         | T_LCB InitializerList T_COMMA T_RCB {;}
                         ;
 
-InitializerList:        Initializer {;}
+InitializerList:        // e.g. a || a,b
+                        Initializer {;}
                         | InitializerList T_COMMA Initializer {;}
                         ;
 
-StatementList:          Statement {;}
+StatementList:          // e.g. a = 5; return a;
+                        Statement {;}
                         | StatementList Statement {;}
                         ;
 
-Statement:              ExpressionStatement {;}
+Statement:              // e.g. a = 5; || return 7; || {int x = 5; return x + 3;}
+                        ExpressionStatement {;}
                         | SelectionStatement {;}
                         | IterationStatment {;}
                         | JumpStatement {;}
                         | CompoundStatement {;}
                         ;
 
-ExpressionStatement:    T_SEMICOLON {;}
+ExpressionStatement:    // e.g. a = 5; || a,b,c; || x;
+                        T_SEMICOLON {;}
                         | Expression T_SEMICOLON {;}
                         ;
 
-SelectionStatement:     T_IF T_LB Expression T_RB Statement {;}
+SelectionStatement:     // e.g. if(a){...} || if(x+3) {...} else {...}
+                        T_IF T_LB Expression T_RB Statement {;}
                         | T_IF T_LB Expression T_RB Statement T_ELSE Statement {;}
                         ;
 
-IterationStatment:      T_WHILE T_LB Expression T_RB Statement {;}
+IterationStatment:      // e.g. while (x > 3) {...}
+                        T_WHILE T_LB Expression T_RB Statement {;}
                         ;
 
-JumpStatement:          T_RETURN T_SEMICOLON {;}
+JumpStatement:          // e.g. return; || return x == y;
+                        T_RETURN T_SEMICOLON {;}
                         | T_RETURN Expression T_SEMICOLON {;}
                         ;
 
-Expression:             AssignmentExpression {;}
+Expression:             // e.g. a = 5 || a,b,c || x
+                        AssignmentExpression {;}
                         | Expression T_COMMA AssignmentExpression {;}
                         ;
 
-AssignmentExpression:   ConditionalExpression {;}
+AssignmentExpression:   // e.g. a = 5 || a += 2
+                        ConditionalExpression {;}
                         | UnaryExpression AssignmentOperator AssignmentExpression {;}
                         ;
 
-ConditionalExpression:  LogicalOrExpression {;}
+ConditionalExpression:  // e.g. x == y ? a = 1 : b = 3
+                        LogicalOrExpression {;}
                         | LogicalOrExpression T_QUESTION  Expression T_COLON ConditionalExpression {;}
                         ;
 
-LogicalOrExpression:    LogicalAndExpression {;}
+LogicalOrExpression:    // e.g. x || y
+                        LogicalAndExpression {;}
                         | LogicalOrExpression T_OR_OP LogicalAndExpression {;}
                         ;
 
-LogicalAndExpression:   InclusiveOrExpression {;}
+LogicalAndExpression:   // e.g. x && y
+                        InclusiveOrExpression {;}
                         | LogicalAndExpression T_AND_OP InclusiveOrExpression {;}
                         ;
 
-InclusiveOrExpression:  ExclusiveOrExpression {;}
+InclusiveOrExpression:  // e.g. x | y
+                        ExclusiveOrExpression {;}
                         | InclusiveOrExpression T_OR ExclusiveOrExpression {;}
                         ;
 
-ExclusiveOrExpression:  AndExpression {;}
+ExclusiveOrExpression:  // e.g. x ^ y
+                        AndExpression {;}
                         | ExclusiveOrExpression T_XOR AndExpression {;}
                         ;
 
-AndExpression:          EqualityExpression {;}
+AndExpression:          // e.g. x & y
+                        EqualityExpression {;}
                         | AndExpression T_AND EqualityExpression {;}
                         ;
 
-EqualityExpression:     RelationalExpression {;}
+EqualityExpression:     // e.g. x == y || x != y
+                        RelationalExpression {;}
                         | EqualityExpression T_EQUAL_OP RelationalExpression {;}
                         | EqualityExpression T_NEQUAL_OP RelationalExpression {;}
                         ;
 
-RelationalExpression:   ShiftExpression {;}
+RelationalExpression:   // e.g. x > y || x <= y
+                        ShiftExpression {;}
                         | RelationalExpression T_LT ShiftExpression {;}
                         | RelationalExpression T_GT ShiftExpression {;}
                         | RelationalExpression T_LTE_OP ShiftExpression {;}
                         | RelationalExpression T_GTE_OP ShiftExpression {;}
                         ;
 
-ShiftExpression:        AdditiveExpression {;}
+ShiftExpression:        // e.g. x << 2 || y >> 4
+                        AdditiveExpression {;}
                         | ShiftExpression T_LSHIFT_OP AdditiveExpression {;}
                         | ShiftExpression T_RSHIFT_OP AdditiveExpression {;}
                         ;
 
-AdditiveExpression:     MultiplicativeExpression {;}
+AdditiveExpression:     // e.g. x + y || x - y
+                        MultiplicativeExpression {;}
                         | AdditiveExpression T_PLUS MultiplicativeExpression {;}
                         | AdditiveExpression T_MINUS MultiplicativeExpression {;}
                         ;
 
 MultiplicativeExpression:
+                        // e.g. x * y || x / y || x % y
                         UnaryExpression {;}
                         | MultiplicativeExpression T_MULT UnaryExpression {;}
                         | MultiplicativeExpression T_DIV UnaryExpression {;}
                         | MultiplicativeExpression T_MOD UnaryExpression {;}
                         ;
 
-UnaryExpression:        PostfixExpression {;}
+UnaryExpression:        // e.g. !x || ++y
+                        PostfixExpression {;}
                         | UnaryOperator UnaryExpression {;}
                         ;
 
-UnaryOperator:          T_INC_OP {;}
+UnaryOperator:          // e.g. ++ || ! || ~
+                        T_INC_OP {;}
                         | T_DEC_OP {;}
                         | T_PLUS {;}
                         | T_MINUS {;}
@@ -180,18 +211,21 @@ UnaryOperator:          T_INC_OP {;}
                         | T_INVERT {;}
                         ;
 
-PrimaryExpression:      T_IDENTIFIER {;}
+PrimaryExpression:      // e.g. a || 4 || ()
+                        T_IDENTIFIER {;}
                         | T_INT_CONST {;}
                         | T_LB Expression T_RB {;}
                         ;
                         
 
-PostfixExpression:      PrimaryExpression {;}
+PostfixExpression:      // e.g. a++
+                        PrimaryExpression {;}
                         | PostfixExpression T_INC_OP {;}
                         | PostfixExpression T_DEC_OP {;}
                         ;
 
-AssignmentOperator:     T_EQUAL {;}
+AssignmentOperator:     // e.g +=
+                        T_EQUAL {;}
                         | T_ADD_ASSIGN {;}
                         | T_SUB_ASSIGN {;}
                         | T_MULT_ASSIGN {;}
@@ -204,7 +238,8 @@ AssignmentOperator:     T_EQUAL {;}
                         | T_XOR_ASSIGN {;}
                         ;
 
-TypeSpecifier:          T_INT {;}
+TypeSpecifier:          // e.g. int
+                        T_INT {;}
                         ;
 
 %%
