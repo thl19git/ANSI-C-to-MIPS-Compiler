@@ -1,4 +1,4 @@
-#include "compiler.hpp"
+#include "compiler_lexer_testing.hpp"
 
 #include <vector>
 #include <unordered_map>

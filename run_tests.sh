@@ -4,6 +4,7 @@
 DIRECTORY = $1
 TESTCASE = $2
 
+make clean
 make bin/c_compiler
 
 # Check if a directory was passed

@@ -8,7 +8,7 @@
 /* Bring in our declarations for token types and
    the yylval variable. */
 #include <stdlib.h>
-#include "parser_test.tab.hpp"
+#include "parser.tab.hpp"
 #include <string>
 std::string* wordT = new std::string;
 
