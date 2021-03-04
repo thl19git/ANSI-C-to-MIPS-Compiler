@@ -1,3 +1,5 @@
+#include "../include/ast.hpp"
+
 void parseAST();
 
 int main(){
