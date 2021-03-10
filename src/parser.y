@@ -5,11 +5,19 @@
   int yylex(void);
   void yyerror(const char *);
   #include <string>
+  #include "../include/ast.hpp"
+  //extern const Expression *g_root; // A way of getting the AST out
 }
 
 %union{
   std::string *string;
-  double number;
+  double number
+  Node* node;
+  TranslationUnit* transunit;
+  Function* function;
+  Statement* statement;
+  Expression* expression;
+  Declaration* declaration;
 }
 
 %define parse.error verbose
@@ -25,17 +33,33 @@
 %token T_LB T_RB T_LCB T_RCB T_LSB T_RSB
 
 %type <string> T_IDENTIFIER
+
 %type <number> T_INT_CONST
+
+%type <node> ROOT
+
+%type <transunit> TranslationUnit
+
+%type <function> FunctionDefinition
+
+%type <statement> Statement StatementList IterationStatment JumpStatement ExpressionStatement SelectionStatement CompoundStatement
+
+%type <expression> Expression PrimaryExpression PostfixExpression ConditionalExpression UnaryExpression Initializer InitDeclaratorList
+                   AdditiveExpression MultiplicativeExpression ShiftExpression LogicalAndExpression LogicalOrExpression ExclusiveOrExpression
+                   InclusiveOrExpression RelationalExpression AndExpression AssignmentExpression EqualityExpression
+
+%type <declaration> Declarator Declaration DirectDeclarator DeclarationList InitDeclarator InitDeclaratorList 
 
 %start ROOT
 
 %%
 
-ROOT: TranslationUnit {;}
+ROOT: TranslationUnit {g_root = $1;}
       ;
 
 TranslationUnit:        // e.g. int foo() {...}
-                        FunctionDefinition {;}
+                        FunctionDefinition {$$ = new TranslationUnit($1);}
+                        | TranslationUnit FunctionDefinition {$$->append($2);}
                         ;
                 
 FunctionDefinition:     // e.g. int foo() {...}
@@ -244,7 +268,18 @@ TypeSpecifier:          // e.g. int
 
 %%
 
+/*to do: extract AST
 
+const Expression *g_root; // Definition of variable (to match declaration earlier)
+
+const Expression *parseAST()
+{
+  g_root=0;
+  yyparse();
+  return g_root;
+}
+
+*/
 void parseAST(){
   yyparse();
 }
