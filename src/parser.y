@@ -32,7 +32,7 @@
 %token T_SEMICOLON T_COMMA T_COLON
 %token T_LB T_RB T_LCB T_RCB T_LSB T_RSB
 
-%type <string> T_IDENTIFIER
+%type <string> T_IDENTIFIER AssignmentOperator UnaryOperator
 
 %type <number> T_INT_CONST
 
@@ -54,8 +54,8 @@
 
 %%
 
-ROOT: TranslationUnit {g_root = $1;}
-      ;
+ROOT:                   TranslationUnit {g_root = $1;}
+                        ;
 
 TranslationUnit:        // e.g. int foo() {...}
                         FunctionDefinition {$$ = new TranslationUnit($1);}
@@ -227,12 +227,12 @@ UnaryExpression:        // e.g. !x || ++y
                         ;
 
 UnaryOperator:          // e.g. ++ || ! || ~
-                        T_INC_OP {;}
-                        | T_DEC_OP {;}
-                        | T_PLUS {;}
-                        | T_MINUS {;}
-                        | T_NOT {;}
-                        | T_INVERT {;}
+                        T_INC_OP {$$ = "++";}
+                        | T_DEC_OP {$$ = "--";}
+                        | T_PLUS {$$ = "+";}
+                        | T_MINUS {$$ = "-";}
+                        | T_NOT {$$ = "!";}
+                        | T_INVERT {$$ = "~";}
                         ;
 
 PrimaryExpression:      // e.g. a || 4 || ()
@@ -249,17 +249,17 @@ PostfixExpression:      // e.g. a++
                         ;
 
 AssignmentOperator:     // e.g +=
-                        T_EQUAL {;}
-                        | T_ADD_ASSIGN {;}
-                        | T_SUB_ASSIGN {;}
-                        | T_MULT_ASSIGN {;}
-                        | T_DIV_ASSIGN {;}
-                        | T_MOD_ASSIGN {;}
-                        | T_LSHIFT_ASSIGN {;}
-                        | T_RSHIFT_ASSIGN {;}
-                        | T_AND_ASSIGN {;}
-                        | T_OR_ASSIGN {;}
-                        | T_XOR_ASSIGN {;}
+                        T_EQUAL {$$ = "=";}
+                        | T_ADD_ASSIGN {$$ = "+=";}
+                        | T_SUB_ASSIGN {$$ = "-=";}
+                        | T_MULT_ASSIGN {$$ = "*=";}
+                        | T_DIV_ASSIGN {$$ = "/=";}
+                        | T_MOD_ASSIGN {$$ = "%=";}
+                        | T_LSHIFT_ASSIGN {$$ = "<<=";}
+                        | T_RSHIFT_ASSIGN {$$ = ">>=";}
+                        | T_AND_ASSIGN {$$ = "&=";}
+                        | T_OR_ASSIGN {$$ = "|=";}
+                        | T_XOR_ASSIGN {$$ = "^=";}
                         ;
 
 TypeSpecifier:          // e.g. int
