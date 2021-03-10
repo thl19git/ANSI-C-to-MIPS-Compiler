@@ -23,10 +23,10 @@ public:
 class BinaryExpression : public Expression {
 protected:
     ExpressionPtr left_;
-    ExpressionPtr right;
+    ExpressionPtr right_;
 
 public:
-    BinaryExpression(/*some things*/);
+    BinaryExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -51,7 +51,7 @@ protected:
     //does this require anything?
 
 public:
-    AssignmentExpression(/*some things*/);
+    AssignmentExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -76,7 +76,7 @@ class AdditiveExpression : public BinaryExpression {
 protected:
     std::string op_;
 public:
-    AdditiveExpression(/*some things*/);
+    AdditiveExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -88,7 +88,7 @@ class MultiplicativeExpression : public BinaryExpression {
 protected:
     std::string op_;
 public:
-    MultiplicativeExpression(/*some things*/);
+    MultiplicativeExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -100,7 +100,7 @@ class ShiftExpression : public BinaryExpression {
 protected:
     std::string op_;
 public:
-    ShiftExpression(/*some things*/);
+    ShiftExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -112,7 +112,7 @@ class RelationalExpression : public BinaryExpression {
 protected:
     std::string op_;
 public:
-    RelationalExpression(/*some things*/);
+    RelationalExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -124,7 +124,7 @@ class EqualityExpression : public BinaryExpression {
 protected:
     std::string op_;
 public:
-    EqualityExpression(/*some things*/);
+    EqualityExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -136,7 +136,7 @@ class LogicalOrExpression : public BinaryExpression {
 protected:
 
 public:
-    LogicalOrExpression(/*some things*/);
+    LogicalOrExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -148,7 +148,7 @@ class LogicalAndExpression : public BinaryExpression {
 protected:
 
 public:
-    LogicalAndExpression(/*some things*/);
+    LogicalAndExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -160,7 +160,7 @@ class InclusiveOrExpression : public BinaryExpression {
 protected:
 
 public:
-    InclusiveOrExpression(/*some things*/);
+    InclusiveOrExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -172,7 +172,7 @@ class ExclusiveOrExpression : public BinaryExpression {
 protected:
 
 public:
-    ExclusiveOrExpression(/*some things*/);
+    ExclusiveOrExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -184,7 +184,7 @@ class AndExpression : public BinaryExpression {
 protected:
 
 public:
-    AndExpression(/*some things*/);
+    AndExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -198,7 +198,7 @@ protected:
     ExpressionPtr unaryExpression_;
 
 public:
-    UnaryOpExpression(/*some things*/);
+    UnaryOpExpression(std::string op, ExpressionPtr unaryExpression);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -212,7 +212,7 @@ protected:
     ExpressionPtr postfixExpression_;
 
 public:
-    PostfixExpression(/*some things*/);
+    PostfixExpression(std::string op, ExpressionPtr postfixExpression);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -225,7 +225,7 @@ protected:
     std::string id_;
 
 public:
-    Identifier(/*some things*/);
+    Identifier(std::string id);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -238,7 +238,7 @@ protected:
     double value_;
 
 public:
-    Constant(/*some things*/);
+    Constant(double value);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -274,8 +274,8 @@ void Expression::printASM(/*Bindings *bindings*/){
 
 // *********** BINARY EXPRESSION CLASS ************ //
 
-BinaryExpression::BinaryExpression(/*some things*/){
-    //TODO
+BinaryExpression::BinaryExpression(ExpressionPtr left, ExpressionPtr right) : left_(left), right_(right){
+
 }
 
 void BinaryExpression::print(){
@@ -304,8 +304,8 @@ void UnaryExpression::printASM(/*Bindings *bindings*/){
 
 // *********** ASSIGNMENT EXPRESSION CLASS ************ //
 
-AssignmentExpression::AssignmentExpression(/*some things*/){
-    //TODO
+AssignmentExpression::AssignmentExpression(ExpressionPtr left, ExpressionPtr right) : BinaryExpression(left, right){
+
 }
 
 void AssignmentExpression::print(){
@@ -334,8 +334,8 @@ void ConditionalExpression::printASM(/*Bindings *bindings*/){
 
 // *********** ADDITIVE EXPRESSION CLASS ************ //
 
-AdditiveExpression::AdditiveExpression(/*some things*/){
-    //TODO
+AdditiveExpression::AdditiveExpression(ExpressionPtr left, std::string op, ExpressionPtr right) : BinaryExpression(left, right), op_(op) {
+
 }
 
 void AdditiveExpression::print(){
@@ -349,8 +349,8 @@ void AdditiveExpression::printASM(/*Bindings *bindings*/){
 
 // *********** MULTIPLICATIVE EXPRESSION CLASS ************ //
 
-MultiplicativeExpression::MultiplicativeExpression(/*some things*/){
-    //TODO
+MultiplicativeExpression::MultiplicativeExpression(ExpressionPtr left, std::string op, ExpressionPtr right) : BinaryExpression(left, right), op_(op)  {
+
 }
 
 void MultiplicativeExpression::print(){
@@ -363,8 +363,8 @@ void MultiplicativeExpression::printASM(/*Bindings *bindings*/){
 
 // *********** SHIFT EXPRESSION CLASS ************ //
 
-ShiftExpression::ShiftExpression(/*some things*/){
-    //TODO
+ShiftExpression::ShiftExpression(ExpressionPtr left, std::string op, ExpressionPtr right) : BinaryExpression(left, right), op_(op)  {
+
 }
 
 void ShiftExpression::print(){
@@ -378,8 +378,8 @@ void ShiftExpression::printASM(/*Bindings *bindings*/){
 
 // *********** RELATIONAL EXPRESSION CLASS ************ //
 
-RelationalExpression::RelationalExpression(/*some things*/){
-    //TODO
+RelationalExpression::RelationalExpression(ExpressionPtr left, std::string op, ExpressionPtr right) : BinaryExpression(left, right), op_(op)  {
+
 }
 
 void RelationalExpression::print(){
@@ -393,8 +393,8 @@ void RelationalExpression::printASM(/*Bindings *bindings*/){
 
 // *********** EQUALITY EXPRESSION CLASS ************ //
 
-EqualityExpression::EqualityExpression(/*some things*/){
-    //TODO
+EqualityExpression::EqualityExpression(ExpressionPtr left, std::string op, ExpressionPtr right) : BinaryExpression(left, right), op_(op)  {
+
 }
 
 void EqualityExpression::print(){
@@ -408,8 +408,8 @@ void EqualityExpression::printASM(/*Bindings *bindings*/){
 
 // *********** LOGICAL OR EXPRESSION CLASS ************ //
 
-LogicalOrExpression::LogicalOrExpression(/*some things*/){
-    //TODO
+LogicalOrExpression::LogicalOrExpression(ExpressionPtr left, ExpressionPtr right) : BinaryExpression(left, right) {
+
 }
 
 void LogicalOrExpression::print(){
@@ -423,8 +423,8 @@ void LogicalOrExpression::printASM(/*Bindings *bindings*/){
 
 // *********** LOGICAL AND EXPRESSION CLASS ************ //
 
-LogicalAndExpression::LogicalAndExpression(/*some things*/){
-    //TODO
+LogicalAndExpression::LogicalAndExpression(ExpressionPtr left, ExpressionPtr right) : BinaryExpression(left, right) {
+
 }
 
 void LogicalAndExpression::print(){
@@ -438,8 +438,8 @@ void LogicalAndExpression::printASM(/*Bindings *bindings*/){
 
 // *********** INCLUSIVE OR EXPRESSION CLASS ************ //
 
-InclusiveOrExpression::InclusiveOrExpression(/*some things*/){
-    //TODO
+InclusiveOrExpression::InclusiveOrExpression(ExpressionPtr left, ExpressionPtr right) : BinaryExpression(left, right) {
+
 }
 
 void InclusiveOrExpression::print(){
@@ -453,8 +453,8 @@ void InclusiveOrExpression::printASM(/*Bindings *bindings*/){
 
 // *********** EXCLUSIVE OR EXPRESSION CLASS ************ //
 
-ExclusiveOrExpression::ExclusiveOrExpression(/*some things*/){
-    //TODO
+ExclusiveOrExpression::ExclusiveOrExpression(ExpressionPtr left, ExpressionPtr right) : BinaryExpression(left, right) {
+
 }
 
 void ExclusiveOrExpression::print(){
@@ -468,8 +468,8 @@ void ExclusiveOrExpression::printASM(/*Bindings *bindings*/){
 
 // *********** AND EXPRESSION CLASS ************ //
 
-AndExpression::AndExpression(/*some things*/){
-    //TODO
+AndExpression::AndExpression(ExpressionPtr left, ExpressionPtr right) : BinaryExpression(left, right) {
+
 }
 
 void AndExpression::print(){
@@ -483,8 +483,8 @@ void AndExpression::printASM(/*Bindings *bindings*/){
 
 // *********** UNARY OP EXPRESSION CLASS ************ //
 
-UnaryOpExpression::UnaryOpExpression(/*some things*/){
-    //TODO
+UnaryOpExpression::UnaryOpExpression(std::string op, ExpressionPtr unaryExpression) : op_(op), unaryExpression_(unaryExpression) {
+
 }
 
 void UnaryOpExpression::print(){
@@ -498,8 +498,8 @@ void UnaryOpExpression::printASM(/*Bindings *bindings*/){
 
 // *********** POSTFIX EXPRESSION CLASS ************ //
 
-PostfixExpression::PostfixExpression(/*some things*/){
-    //TODO
+PostfixExpression::PostfixExpression(std::string op, ExpressionPtr postfixExpression) : op_(op), postfixExpression_(postfixExpression) {
+
 }
 
 void PostfixExpression::print(){
@@ -513,8 +513,8 @@ void PostfixExpression::printASM(/*Bindings *bindings*/){
 
 // *********** IDENTIFIER CLASS ************ //
 
-Identifier::Identifier(/*some things*/){
-    //TODO
+Identifier::Identifier(std::string id) : id_(id) {
+
 }
 
 void Identifier::print(){
@@ -528,8 +528,8 @@ void Identifier::printASM(/*Bindings *bindings*/){
 
 // *********** CONSTANT CLASS ************ //
 
-Constant::Constant(/*some things*/){
-    //TODO
+Constant::Constant(double value) : value_(value){
+    
 }
 
 void Constant::print(){
