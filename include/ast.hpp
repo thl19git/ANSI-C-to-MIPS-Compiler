@@ -3,6 +3,7 @@
 
 //include all ast classes here
 #include "node.hpp"
+#include "translationunit.hpp"
 #include "function.hpp"
 #include "statement.hpp"
 #include "declaration.hpp"
