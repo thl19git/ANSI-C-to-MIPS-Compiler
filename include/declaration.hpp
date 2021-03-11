@@ -11,13 +11,17 @@ typedef Declaration* DeclarationPtr;
 class Declaration : public Node {
 protected:
     ExpressionPtr initializer_;
-    //type
-    //DeclarationPtr to next declaration?
+    std::string type_;
+    DeclarationPtr nextDeclaration_;
 
 public:
-    Declaration(/*some things*/);
+    Declaration(ExpressionPtr initializer);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
+    void linkDeclaration(DeclarationPtr declaration);
+    void setType(std::string type);
+    DeclarationPtr getNext();
+    void setInitializer(ExpressionPtr initializer);
 
 };
 
@@ -29,7 +33,7 @@ protected:
     std::string id_;
 
 public:
-    IdentifierDeclaration(/*some things*/);
+    IdentifierDeclaration(std::string id, ExpressionPtr initializer = nullptr);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };

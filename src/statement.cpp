@@ -2,8 +2,7 @@
 
 // *********** BASIC STATEMENT CLASS ************ //
 
-Statement::Statement(/*some things*/){
-    //TODO
+Statement::Statement(StatementPtr nextStatement) : nextStatement_(nextStatement){
 }
 
 void Statement::print(){
@@ -14,11 +13,19 @@ void Statement::printASM(/*Bindings *bindings*/){
     //TODO
 }
 
+void Statement::linkStatement(StatementPtr statement){
+    nextStatement_ = statement;
+}
+
 
 // ************ COMPOUND STATEMENT CLASS ************ //
 
-CompoundStatement::CompoundStatement(/*some things*/){
-    //TODO
+CompoundStatement::CompoundStatement(StatementPtr statement) : Statement(), statement_(statement) {
+
+}
+
+CompoundStatement::CompoundStatement(StatementPtr statement, DeclarationPtr declaration) : Statement(), statement_(statement), declaration_(declaration) {
+
 }
 
 void CompoundStatement::print(){
@@ -32,8 +39,8 @@ void CompoundStatement::printASM(/*Bindings *bindings*/){
 
 // ************ EXPRESSION STATEMENT CLASS ************ //
 
-ExpressionStatement::ExpressionStatement(/*some things*/){
-    //TODO
+ExpressionStatement::ExpressionStatement(ExpressionPtr expression) : Statement(), expression_(expression) {
+
 }
 
 void ExpressionStatement::print(){
@@ -47,8 +54,8 @@ void ExpressionStatement::printASM(/*Bindings *bindings*/){
 
 // *********** IF ELSE STATEMENT CLASS ************ //
 
-IfElseStatement::IfElseStatement(/*some things*/){
-    //TODO
+IfElseStatement::IfElseStatement(ExpressionPtr condition, StatementPtr ifStatement, StatementPtr elseStatement) : Statement(), condition_(condition), ifStatement_(ifStatement), elseStatement_(elseStatement) {
+
 }
 
 void IfElseStatement::print(){
@@ -62,8 +69,8 @@ void IfElseStatement::printASM(/*Bindings *bindings*/){
 
 // *********** ITERATION STATEMENT CLASS ************ //
 
-IterationStatement::IterationStatement(/*some things*/){
-    //TODO
+IterationStatement::IterationStatement(ExpressionPtr condition, StatementPtr statement) : Statement(), condition_(condition), statement_(statement) {
+
 }
 
 void IterationStatement::print(){
@@ -77,7 +84,7 @@ void IterationStatement::printASM(/*Bindings *bindings*/){
 
 // *********** WHILE LOOP CLASS ************ //
 
-WhileLoop::WhileLoop(/*some things*/){
+WhileLoop::WhileLoop(ExpressionPtr condition, StatementPtr statement) : IterationStatement(condition, statement) {
     //TODO
 }
 
@@ -92,10 +99,6 @@ void WhileLoop::printASM(/*Bindings *bindings*/){
 
 // *********** JUMP STATEMENT CLASS ************ //
 
-JumpStatement::JumpStatement(/*some things*/){
-    //TODO
-}
-
 void JumpStatement::print(){
     //TODO
 }
@@ -107,7 +110,7 @@ void JumpStatement::printASM(/*Bindings *bindings*/){
 
 // *********** RETURN STATEMENT CLASS ************ //
 
-ReturnStatement::ReturnStatement(/*some things*/){
+ReturnStatement::ReturnStatement(ExpressionPtr expression) : expression_(expression){
     //TODO
 }
 

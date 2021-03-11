@@ -17,7 +17,7 @@ protected:
     StatementPtr nextStatement_;
 
 public:
-    Statement(/*some things*/);
+    Statement(StatementPtr nextStatement = nullptr);
     virtual void print() = 0;
     virtual void printASM(/*Bindings *bindings*/) = 0;
     void linkStatement(StatementPtr statement);
@@ -32,7 +32,8 @@ protected:
     DeclarationPtr declaration_;
 
 public:
-    CompoundStatement(/*some things*/);
+    CompoundStatement(StatementPtr statement);
+    CompoundStatement(StatementPtr statement = nullptr, DeclarationPtr declaration = nullptr);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 
@@ -46,7 +47,7 @@ protected:
     ExpressionPtr expression_;
 
 public:
-    ExpressionStatement(/*some things*/);
+    ExpressionStatement(ExpressionPtr expression = nullptr);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 
@@ -62,7 +63,7 @@ protected:
     StatementPtr elseStatement_;
 
 public:
-    IfElseStatement(/*some things*/);
+    IfElseStatement(ExpressionPtr condition, StatementPtr ifStatement, StatementPtr elseStatement = nullptr);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -76,7 +77,7 @@ protected:
     StatementPtr statement_;
 
 public:
-    IterationStatement(/*some things*/);
+    IterationStatement(ExpressionPtr condition, StatementPtr statement);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -88,7 +89,7 @@ class WhileLoop : public IterationStatement{
 protected:
 
 public:
-    WhileLoop(/*some things*/);
+    WhileLoop(ExpressionPtr condition, StatementPtr statement);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };
@@ -100,7 +101,6 @@ class JumpStatement : public Statement{
 protected:
 
 public:
-    JumpStatement(/*some things*/);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 
@@ -109,12 +109,12 @@ public:
 
 // *********** RETURN STATEMENT CLASS ************ //
 
-class ReturnStatement : public Statement{
+class ReturnStatement : public JumpStatement{
 protected:
     ExpressionPtr expression_;
 
 public:
-    ReturnStatement(/*some things*/);
+    ReturnStatement(ExpressionPtr expression = nullptr);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 };

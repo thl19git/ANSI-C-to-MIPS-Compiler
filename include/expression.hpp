@@ -10,11 +10,12 @@ typedef Expression* ExpressionPtr;
 
 class Expression : public Node {
 protected:
-
+    ExpressionPtr nextExpression_;
 public:
-    Expression(/*some things*/);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
+    void linkExpression(ExpressionPtr expression);
+    ExpressionPtr getNext();
 };
 
 

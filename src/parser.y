@@ -6,12 +6,12 @@
   void yyerror(const char *);
   #include <string>
   #include "../include/ast.hpp"
-  //extern const Expression *g_root; // A way of getting the AST out
+  extern const Node *g_root; // A way of getting the AST out
 }
 
 %union{
   std::string *string;
-  double number
+  double number;
   Node* node;
   TranslationUnit* transunit;
   Function* function;
@@ -63,167 +63,198 @@ TranslationUnit:        // e.g. int foo() {...}
                         ;
                 
 FunctionDefinition:     // e.g. int foo() {...}
-                        TypeSpecifier Declarator CompoundStatement {;}
-                        | Declarator CompoundStatement {;}
+                        TypeSpecifier Declarator CompoundStatement {$$ = new Function($1,$2,$3)}
                         ;
 
 CompoundStatement:      // e.g. {int x = 5; return x + 3;}
-                        T_LCB T_RCB {;}
-                        | T_LCB StatementList T_RCB {;}
-                        | T_LCB DeclarationList T_RCB {;}
-                        | T_LCB DeclarationList StatementList T_RCB {;}
+                        T_LCB T_RCB {$$ = new CompoundStatement();}
+                        | T_LCB StatementList T_RCB {$$ = new CompoundStatement($2);}
+                        | T_LCB DeclarationList T_RCB {$$ = new CompoundStatement($2);}
+                        | T_LCB DeclarationList StatementList T_RCB {$$ = new CompoundStatement($2,$3);}
                         ;
 
 DeclarationList:        // e.g. int x; int y = 5;
-                        Declaration {;}
-                        | DeclarationList Declaration {;}
+                        Declaration {$$ = $1;}
+                        | DeclarationList Declaration {$$->linkDeclaration($2);}
                         ;
 
 Declaration:            // e.g int x; || int x = 5;
-                        TypeSpecifier InitDeclaratorList T_SEMICOLON {;}
+                        TypeSpecifier InitDeclaratorList T_SEMICOLON {$$ = new Declaration;}
                         ;
 
 
 InitDeclaratorList:     // e.g. x; || x , y || int a = 1, b = 2
-                        InitDeclarator {;}
-                        | InitDeclaratorList T_COMMA InitDeclarator {;}
+                        InitDeclarator {$$ = $1;}
+                        | InitDeclaratorList T_COMMA InitDeclarator {$3->linkDeclaration($$); $$ = $3;}
                         ;
 
 InitDeclarator:         // e.g. a || a = 1
-                        Declarator {;}
-                        | Declarator T_EQUAL Initializer {;}
+                        Declarator {$$ = $1;}
+                        | Declarator T_EQUAL Initializer {$$ = $1; $$->setInitializer($3)}
                         ;
 
 Declarator:             // e.g. a || sum
-                        DirectDeclarator {;}
+                        DirectDeclarator {$$ = $1;}
                         ;
 
 DirectDeclarator:       // e.g. a || sum
-                        T_IDENTIFIER {;}
-                        | T_LB Declarator T_RB {;}
-                        | DirectDeclarator T_LB T_RB {;}
+                        T_IDENTIFIER {$$ = new IdentifierDeclaration(*$1);}
+                        | T_LB Declarator T_RB {$$ = $2;}
+                        | DirectDeclarator T_LB T_RB {;} //TODO
                         ;
-
+ 
 Initializer:            // e.g. a || b = 2
-                        AssignmentExpression {;}
-                        | T_LCB InitializerList T_RCB {;}
-                        | T_LCB InitializerList T_COMMA T_RCB {;}
+                        AssignmentExpression {$$ = $1;}
+                        | T_LCB InitializerList T_RCB {$$ = new Initializer($2);}
+                        | T_LCB InitializerList T_COMMA T_RCB {$$ = new Initializer($2);}
                         ;
 
 InitializerList:        // e.g. a || a,b
-                        Initializer {;}
-                        | InitializerList T_COMMA Initializer {;}
+                        Initializer {$$ = $1;}
+                        | InitializerList T_COMMA Initializer {$3->linkExpression($$); $$ = $3;}
                         ;
 
 StatementList:          // e.g. a = 5; return a;
-                        Statement {;}
-                        | StatementList Statement {;}
+                        Statement {$$ = $1;}
+                        | StatementList Statement {$$->linkStatement($2);}
                         ;
 
 Statement:              // e.g. a = 5; || return 7; || {int x = 5; return x + 3;}
-                        ExpressionStatement {;}
-                        | SelectionStatement {;}
-                        | IterationStatment {;}
-                        | JumpStatement {;}
-                        | CompoundStatement {;}
+                        ExpressionStatement {$$ = $1;}
+                        | SelectionStatement {$$ = $1;}
+                        | IterationStatment {$$ = $1;}
+                        | JumpStatement {$$ = $1;}
+                        | CompoundStatement {$$ = $1;}
                         ;
 
 ExpressionStatement:    // e.g. a = 5; || a,b,c; || x;
-                        T_SEMICOLON {;}
-                        | Expression T_SEMICOLON {;}
+                        T_SEMICOLON {$$ = new ExpressionStatement;}
+                        | Expression T_SEMICOLON {$$ = new ExpressionStatement($1);}
                         ;
 
 SelectionStatement:     // e.g. if(a){...} || if(x+3) {...} else {...}
-                        T_IF T_LB Expression T_RB Statement {;}
-                        | T_IF T_LB Expression T_RB Statement T_ELSE Statement {;}
+                        T_IF T_LB Expression T_RB Statement {$$ = new IfElseStatement($3,$5);}
+                        | T_IF T_LB Expression T_RB Statement T_ELSE Statement {$$ = new IfElseStatement($3,$5,$7);}
                         ;
 
 IterationStatment:      // e.g. while (x > 3) {...}
-                        T_WHILE T_LB Expression T_RB Statement {;}
+                        T_WHILE T_LB Expression T_RB Statement {$$ = new WhileLoop($3,$5);}
                         ;
 
 JumpStatement:          // e.g. return; || return x == y;
-                        T_RETURN T_SEMICOLON {;}
-                        | T_RETURN Expression T_SEMICOLON {;}
+                        T_RETURN T_SEMICOLON {$$ = new ReturnStatement;}
+                        | T_RETURN Expression T_SEMICOLON {$$ = new ReturnStatement($2);}
                         ;
 
 Expression:             // e.g. a = 5 || a,b,c || x
-                        AssignmentExpression {;}
-                        | Expression T_COMMA AssignmentExpression {;}
+                        AssignmentExpression {$$ = $1;}
                         ;
 
 AssignmentExpression:   // e.g. a = 5 || a += 2
-                        ConditionalExpression {;}
-                        | UnaryExpression AssignmentOperator AssignmentExpression {;}
+                        ConditionalExpression {$$ = $1;}
+                        | UnaryExpression AssignmentOperator AssignmentExpression {
+                            if(*$2 == "="){
+                              $$ = new AssignmentExpression($1,$3)
+                            }else if(*$2 == "+="){
+                              BinaryExpression* temp = new AdditiveExpression($1,"+",$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else if(*$2 == "-="){
+                              BinaryExpression* temp = new AdditiveExpression($1,"-",$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else if(*$2 == "*="){
+                              BinaryExpression* temp = new MultiplicativeExpression($1,"*",$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else if(*$2 == "/="){
+                              BinaryExpression* temp = new MultiplicativeExpression($1,"/",$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else if(*$2 == "%="){
+                              BinaryExpression* temp = new MultiplicativeExpression($1,"%",$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else if(*$2 == "<<="){
+                              BinaryExpression* temp = new ShiftExpression($1,"<<",$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else if(*$2 == ">>="){
+                              BinaryExpression* temp = new ShiftExpression($1,">>",$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else if(*$2 == "&="){
+                              BinaryExpression* temp = new AndExpression($1,$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else if(*$2 == "|="){
+                              BinaryExpression* temp = new InclusiveOrExpression($1,$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }else{
+                              BinaryExpression* temp = new ExclusiveOrExpression($1,$3);
+                              $$ = new AssignmentExpression($1,temp)};
+                            }
                         ;
 
 ConditionalExpression:  // e.g. x == y ? a = 1 : b = 3
-                        LogicalOrExpression {;}
-                        | LogicalOrExpression T_QUESTION  Expression T_COLON ConditionalExpression {;}
+                        LogicalOrExpression {$$ = $1;}
+                        | LogicalOrExpression T_QUESTION  Expression T_COLON ConditionalExpression {;} //TODO
                         ;
 
 LogicalOrExpression:    // e.g. x || y
-                        LogicalAndExpression {;}
-                        | LogicalOrExpression T_OR_OP LogicalAndExpression {;}
+                        LogicalAndExpression {$$ = $1;}
+                        | LogicalOrExpression T_OR_OP LogicalAndExpression {$$ = new LogicalOrExpression($1,$2);}
                         ;
 
 LogicalAndExpression:   // e.g. x && y
-                        InclusiveOrExpression {;}
-                        | LogicalAndExpression T_AND_OP InclusiveOrExpression {;}
+                        InclusiveOrExpression {$$ = $1;}
+                        | LogicalAndExpression T_AND_OP InclusiveOrExpression {$$ = new LogicalAndExpression($1,$2);}
                         ;
 
 InclusiveOrExpression:  // e.g. x | y
-                        ExclusiveOrExpression {;}
-                        | InclusiveOrExpression T_OR ExclusiveOrExpression {;}
+                        ExclusiveOrExpression {$$ = $1;}
+                        | InclusiveOrExpression T_OR ExclusiveOrExpression {$$ = new InclusiveOrExpression($1,$2);}
                         ;
 
 ExclusiveOrExpression:  // e.g. x ^ y
-                        AndExpression {;}
-                        | ExclusiveOrExpression T_XOR AndExpression {;}
+                        AndExpression {$$ = $1;}
+                        | ExclusiveOrExpression T_XOR AndExpression {$$ = new ExclusiveOrExpression($1,$2);}
                         ;
 
 AndExpression:          // e.g. x & y
-                        EqualityExpression {;}
-                        | AndExpression T_AND EqualityExpression {;}
+                        EqualityExpression {$$ = $1;}
+                        | AndExpression T_AND EqualityExpression {$$ = new AndExpression($1,$2);}
                         ;
 
 EqualityExpression:     // e.g. x == y || x != y
-                        RelationalExpression {;}
-                        | EqualityExpression T_EQUAL_OP RelationalExpression {;}
-                        | EqualityExpression T_NEQUAL_OP RelationalExpression {;}
+                        RelationalExpression {$$ = $1;}
+                        | EqualityExpression T_EQUAL_OP RelationalExpression {$$ = new EqualityExpression($1,"==",$3);}
+                        | EqualityExpression T_NEQUAL_OP RelationalExpression {$$ = new EqualityExpression($1,"!=",$3);}
                         ;
 
 RelationalExpression:   // e.g. x > y || x <= y
-                        ShiftExpression {;}
-                        | RelationalExpression T_LT ShiftExpression {;}
-                        | RelationalExpression T_GT ShiftExpression {;}
-                        | RelationalExpression T_LTE_OP ShiftExpression {;}
-                        | RelationalExpression T_GTE_OP ShiftExpression {;}
+                        ShiftExpression {$$ = $1;}
+                        | RelationalExpression T_LT ShiftExpression {$$ = new RelationalExpression($1,"<",$3);}
+                        | RelationalExpression T_GT ShiftExpression {$$ = new RelationalExpression($1,">",$3);}
+                        | RelationalExpression T_LTE_OP ShiftExpression {$$ = new RelationalExpression($1,"<=",$3);}
+                        | RelationalExpression T_GTE_OP ShiftExpression {$$ = new RelationalExpression($1,">=",$3);}
                         ;
 
 ShiftExpression:        // e.g. x << 2 || y >> 4
-                        AdditiveExpression {;}
-                        | ShiftExpression T_LSHIFT_OP AdditiveExpression {;}
-                        | ShiftExpression T_RSHIFT_OP AdditiveExpression {;}
+                        AdditiveExpression {$$ = $1;}
+                        | ShiftExpression T_LSHIFT_OP AdditiveExpression {$$ = new ShiftExpression($1,"<<",$3);}
+                        | ShiftExpression T_RSHIFT_OP AdditiveExpression {$$ = new ShiftExpression($1,">>",$3);}
                         ;
 
 AdditiveExpression:     // e.g. x + y || x - y
-                        MultiplicativeExpression {;}
-                        | AdditiveExpression T_PLUS MultiplicativeExpression {;}
-                        | AdditiveExpression T_MINUS MultiplicativeExpression {;}
+                        MultiplicativeExpression {$$ = $1;}
+                        | AdditiveExpression T_PLUS MultiplicativeExpression {$$ = new AdditiveExpression($1,"+",$3);}
+                        | AdditiveExpression T_MINUS MultiplicativeExpression {$$ = new AdditiveExpression($1,"-",$3);}
                         ;
 
 MultiplicativeExpression:
                         // e.g. x * y || x / y || x % y
-                        UnaryExpression {;}
-                        | MultiplicativeExpression T_MULT UnaryExpression {;}
-                        | MultiplicativeExpression T_DIV UnaryExpression {;}
-                        | MultiplicativeExpression T_MOD UnaryExpression {;}
+                        UnaryExpression {$$ = $1;}
+                        | MultiplicativeExpression T_MULT UnaryExpression {$$ = new MultiplicativeExpression($1,"*",$3);}
+                        | MultiplicativeExpression T_DIV UnaryExpression {$$ = new MultiplicativeExpression($1,"/",$3);}
+                        | MultiplicativeExpression T_MOD UnaryExpression {$$ = new MultiplicativeExpression($1,"%",$3);}
                         ;
 
 UnaryExpression:        // e.g. !x || ++y
-                        PostfixExpression {;}
-                        | UnaryOperator UnaryExpression {;}
+                        PostfixExpression {$$ = $1;}
+                        | UnaryOperator UnaryExpression {$$ = new UnaryOpExpression(*$1,$2);}
                         ;
 
 UnaryOperator:          // e.g. ++ || ! || ~
@@ -236,16 +267,16 @@ UnaryOperator:          // e.g. ++ || ! || ~
                         ;
 
 PrimaryExpression:      // e.g. a || 4 || ()
-                        T_IDENTIFIER {;}
-                        | T_INT_CONST {;}
-                        | T_LB Expression T_RB {;}
+                        T_IDENTIFIER {$$ = new Identifier($1);}
+                        | T_INT_CONST {$$ = new Constant($1);}
+                        | T_LB Expression T_RB {$$ = $2;}
                         ;
                         
 
 PostfixExpression:      // e.g. a++
-                        PrimaryExpression {;}
-                        | PostfixExpression T_INC_OP {;}
-                        | PostfixExpression T_DEC_OP {;}
+                        PrimaryExpression {$$ = $1}
+                        | PostfixExpression T_INC_OP {$$ = new PostfixExpression("++",$1);}
+                        | PostfixExpression T_DEC_OP {$$ = new PostfixExpression("--",$1);}
                         ;
 
 AssignmentOperator:     // e.g +=
@@ -263,23 +294,17 @@ AssignmentOperator:     // e.g +=
                         ;
 
 TypeSpecifier:          // e.g. int
-                        T_INT {;}
+                        T_INT {$$ = $1;}
                         ;
 
 %%
 
-/*to do: extract AST
 
-const Expression *g_root; // Definition of variable (to match declaration earlier)
+const Node *g_root; // Definition of variable (to match declaration earlier)
 
-const Expression *parseAST()
+const Node *parseAST()
 {
   g_root=0;
   yyparse();
   return g_root;
-}
-
-*/
-void parseAST(){
-  yyparse();
 }

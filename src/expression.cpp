@@ -2,16 +2,20 @@
 
 // *********** BASIC EXPRESSION CLASS ************ //
 
-Expression::Expression(/*some things*/){
-    //TODO
-}
-
 void Expression::print(){
     //TODO
 }
 
 void Expression::printASM(/*Bindings *bindings*/){
     //TODO
+}
+
+void Expression::linkExpression(ExpressionPtr expression){
+    nextExpression_ = expression;
+}
+
+ExpressionPtr Expression::getNext(){
+    return nextExpression_;
 }
 
 

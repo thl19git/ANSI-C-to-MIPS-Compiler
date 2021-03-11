@@ -1,6 +1,6 @@
 #include "../include/function.hpp"
 
-Function::Function(/*some things*/){
+Function::Function(std::string type, std::string name, StatementPtr statement) : type_(type), name_(name), statement_(statement){
     //TO DO
 }
 
