@@ -227,12 +227,12 @@ UnaryExpression:        // e.g. !x || ++y
                         ;
 
 UnaryOperator:          // e.g. ++ || ! || ~
-                        T_INC_OP {$$ = "++";}
-                        | T_DEC_OP {$$ = "--";}
-                        | T_PLUS {$$ = "+";}
-                        | T_MINUS {$$ = "-";}
-                        | T_NOT {$$ = "!";}
-                        | T_INVERT {$$ = "~";}
+                        T_INC_OP {$$ = $1;}
+                        | T_DEC_OP {$$ = $1;}
+                        | T_PLUS {$$ = $1;}
+                        | T_MINUS {$$ = $1;}
+                        | T_NOT {$$ = $1;}
+                        | T_INVERT {$$ = $1;}
                         ;
 
 PrimaryExpression:      // e.g. a || 4 || ()
@@ -249,17 +249,17 @@ PostfixExpression:      // e.g. a++
                         ;
 
 AssignmentOperator:     // e.g +=
-                        T_EQUAL {$$ = "=";}
-                        | T_ADD_ASSIGN {$$ = "+=";}
-                        | T_SUB_ASSIGN {$$ = "-=";}
-                        | T_MULT_ASSIGN {$$ = "*=";}
-                        | T_DIV_ASSIGN {$$ = "/=";}
-                        | T_MOD_ASSIGN {$$ = "%=";}
-                        | T_LSHIFT_ASSIGN {$$ = "<<=";}
-                        | T_RSHIFT_ASSIGN {$$ = ">>=";}
-                        | T_AND_ASSIGN {$$ = "&=";}
-                        | T_OR_ASSIGN {$$ = "|=";}
-                        | T_XOR_ASSIGN {$$ = "^=";}
+                        T_EQUAL {$$ = $1;}
+                        | T_ADD_ASSIGN {$$ = $1;}
+                        | T_SUB_ASSIGN {$$ = $1;}
+                        | T_MULT_ASSIGN {$$ = $1;}
+                        | T_DIV_ASSIGN {$$ = $1;}
+                        | T_MOD_ASSIGN {$$ = $1;}
+                        | T_LSHIFT_ASSIGN {$$ = $1;}
+                        | T_RSHIFT_ASSIGN {$$ = $1;}
+                        | T_AND_ASSIGN {$$ = $1;}
+                        | T_OR_ASSIGN {$$ = $1;}
+                        | T_XOR_ASSIGN {$$ = $1;}
                         ;
 
 TypeSpecifier:          // e.g. int
