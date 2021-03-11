@@ -4,6 +4,7 @@
 #include "node.hpp"
 #include "expression.hpp"
 
+class Declaration;
 typedef Declaration* DeclarationPtr;
 
 // *********** BASIC DECLARATION CLASS ************ //
@@ -16,12 +17,13 @@ protected:
 
 public:
     Declaration(ExpressionPtr initializer);
-    virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual void print() = 0;
+    virtual void printASM(/*Bindings *bindings*/) = 0;
     void linkDeclaration(DeclarationPtr declaration);
     void setType(std::string type);
     DeclarationPtr getNext();
     void setInitializer(ExpressionPtr initializer);
+    virtual std::string getId() = 0;
 
 };
 
@@ -36,6 +38,7 @@ public:
     IdentifierDeclaration(std::string id, ExpressionPtr initializer = nullptr);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
+    virtual std::string getId();
 };
 
 #endif

@@ -6,10 +6,6 @@ Declaration::Declaration(ExpressionPtr initializer) : initializer_(initializer) 
 
 }
 
-void Declaration::print(){
-    //TODO
-}
-
 void Declaration::printASM(/*Bindings *bindings*/){
     //TODO
 }
@@ -38,9 +34,16 @@ IdentifierDeclaration::IdentifierDeclaration(std::string id, ExpressionPtr initi
 }
 
 void IdentifierDeclaration::print(){
-    //TODO
+    if(nextDeclaration_!=nullptr){
+        nextDeclaration_->print();
+    }
+    std::cout << id_ << " ";
 }
 
 void IdentifierDeclaration::printASM(/*Bindings *bindings*/){
     //TODO
+}
+
+std::string IdentifierDeclaration::getId(){
+    return id_;
 }

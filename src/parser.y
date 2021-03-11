@@ -32,7 +32,8 @@
 %token T_SEMICOLON T_COMMA T_COLON
 %token T_LB T_RB T_LCB T_RCB T_LSB T_RSB
 
-%type <string> T_IDENTIFIER AssignmentOperator UnaryOperator
+%type <string> T_IDENTIFIER AssignmentOperator UnaryOperator T_INT T_INC_OP T_DEC_OP T_PLUS T_MINUS T_NOT T_INVERT T_EQUAL TypeSpecifier
+               T_ADD_ASSIGN T_SUB_ASSIGN T_MULT_ASSIGN T_DIV_ASSIGN T_MOD_ASSIGN T_LSHIFT_ASSIGN T_RSHIFT_ASSIGN T_AND_ASSIGN T_OR_ASSIGN T_XOR_ASSIGN
 
 %type <number> T_INT_CONST
 
@@ -44,7 +45,7 @@
 
 %type <statement> Statement StatementList IterationStatment JumpStatement ExpressionStatement SelectionStatement CompoundStatement
 
-%type <expression> Expression PrimaryExpression PostfixExpression ConditionalExpression UnaryExpression Initializer InitDeclaratorList
+%type <expression> Expression PrimaryExpression PostfixExpression ConditionalExpression UnaryExpression Initializer InitializerList
                    AdditiveExpression MultiplicativeExpression ShiftExpression LogicalAndExpression LogicalOrExpression ExclusiveOrExpression
                    InclusiveOrExpression RelationalExpression AndExpression AssignmentExpression EqualityExpression
 
@@ -63,23 +64,28 @@ TranslationUnit:        // e.g. int foo() {...}
                         ;
                 
 FunctionDefinition:     // e.g. int foo() {...}
-                        TypeSpecifier Declarator CompoundStatement {$$ = new Function($1,$2,$3)}
+                        TypeSpecifier Declarator CompoundStatement {$$ = new Function(*$1,$2->getId(),$3);}
                         ;
 
 CompoundStatement:      // e.g. {int x = 5; return x + 3;}
                         T_LCB T_RCB {$$ = new CompoundStatement();}
-                        | T_LCB StatementList T_RCB {$$ = new CompoundStatement($2);}
-                        | T_LCB DeclarationList T_RCB {$$ = new CompoundStatement($2);}
-                        | T_LCB DeclarationList StatementList T_RCB {$$ = new CompoundStatement($2,$3);}
+                        | T_LCB StatementList T_RCB {$$ = new CompoundStatement($2,NULL);}
+                        | T_LCB DeclarationList T_RCB {$$ = new CompoundStatement(NULL,$2);}
+                        | T_LCB DeclarationList StatementList T_RCB {$$ = new CompoundStatement($3,$2);}
                         ;
 
 DeclarationList:        // e.g. int x; int y = 5;
                         Declaration {$$ = $1;}
-                        | DeclarationList Declaration {$$->linkDeclaration($2);}
+                        | DeclarationList Declaration {$2->linkDeclaration($$); $$ = $2;}
                         ;
 
 Declaration:            // e.g int x; || int x = 5;
-                        TypeSpecifier InitDeclaratorList T_SEMICOLON {$$ = new Declaration;}
+                        TypeSpecifier InitDeclaratorList T_SEMICOLON {$$ = $2;
+                                                                      Declaration* temp = $2;
+                                                                      while(temp->getNext()!=nullptr){
+                                                                        temp->setType(*$1);
+                                                                        temp = temp->getNext();
+                                                                      }}
                         ;
 
 
@@ -90,7 +96,7 @@ InitDeclaratorList:     // e.g. x; || x , y || int a = 1, b = 2
 
 InitDeclarator:         // e.g. a || a = 1
                         Declarator {$$ = $1;}
-                        | Declarator T_EQUAL Initializer {$$ = $1; $$->setInitializer($3)}
+                        | Declarator T_EQUAL Initializer {$$ = $1; $$->setInitializer($3);}
                         ;
 
 Declarator:             // e.g. a || sum
@@ -154,38 +160,38 @@ AssignmentExpression:   // e.g. a = 5 || a += 2
                         ConditionalExpression {$$ = $1;}
                         | UnaryExpression AssignmentOperator AssignmentExpression {
                             if(*$2 == "="){
-                              $$ = new AssignmentExpression($1,$3)
+                              $$ = new AssignmentExpression($1,$3);
                             }else if(*$2 == "+="){
                               BinaryExpression* temp = new AdditiveExpression($1,"+",$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else if(*$2 == "-="){
                               BinaryExpression* temp = new AdditiveExpression($1,"-",$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else if(*$2 == "*="){
                               BinaryExpression* temp = new MultiplicativeExpression($1,"*",$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else if(*$2 == "/="){
                               BinaryExpression* temp = new MultiplicativeExpression($1,"/",$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else if(*$2 == "%="){
                               BinaryExpression* temp = new MultiplicativeExpression($1,"%",$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else if(*$2 == "<<="){
                               BinaryExpression* temp = new ShiftExpression($1,"<<",$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else if(*$2 == ">>="){
                               BinaryExpression* temp = new ShiftExpression($1,">>",$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else if(*$2 == "&="){
                               BinaryExpression* temp = new AndExpression($1,$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else if(*$2 == "|="){
                               BinaryExpression* temp = new InclusiveOrExpression($1,$3);
-                              $$ = new AssignmentExpression($1,temp)};
+                              $$ = new AssignmentExpression($1,temp);
                             }else{
                               BinaryExpression* temp = new ExclusiveOrExpression($1,$3);
-                              $$ = new AssignmentExpression($1,temp)};
-                            }
+                              $$ = new AssignmentExpression($1,temp);
+                            }}
                         ;
 
 ConditionalExpression:  // e.g. x == y ? a = 1 : b = 3
@@ -195,27 +201,27 @@ ConditionalExpression:  // e.g. x == y ? a = 1 : b = 3
 
 LogicalOrExpression:    // e.g. x || y
                         LogicalAndExpression {$$ = $1;}
-                        | LogicalOrExpression T_OR_OP LogicalAndExpression {$$ = new LogicalOrExpression($1,$2);}
+                        | LogicalOrExpression T_OR_OP LogicalAndExpression {$$ = new LogicalOrExpression($1,$3);}
                         ;
 
 LogicalAndExpression:   // e.g. x && y
                         InclusiveOrExpression {$$ = $1;}
-                        | LogicalAndExpression T_AND_OP InclusiveOrExpression {$$ = new LogicalAndExpression($1,$2);}
+                        | LogicalAndExpression T_AND_OP InclusiveOrExpression {$$ = new LogicalAndExpression($1,$3);}
                         ;
 
 InclusiveOrExpression:  // e.g. x | y
                         ExclusiveOrExpression {$$ = $1;}
-                        | InclusiveOrExpression T_OR ExclusiveOrExpression {$$ = new InclusiveOrExpression($1,$2);}
+                        | InclusiveOrExpression T_OR ExclusiveOrExpression {$$ = new InclusiveOrExpression($1,$3);}
                         ;
 
 ExclusiveOrExpression:  // e.g. x ^ y
                         AndExpression {$$ = $1;}
-                        | ExclusiveOrExpression T_XOR AndExpression {$$ = new ExclusiveOrExpression($1,$2);}
+                        | ExclusiveOrExpression T_XOR AndExpression {$$ = new ExclusiveOrExpression($1,$3);}
                         ;
 
 AndExpression:          // e.g. x & y
                         EqualityExpression {$$ = $1;}
-                        | AndExpression T_AND EqualityExpression {$$ = new AndExpression($1,$2);}
+                        | AndExpression T_AND EqualityExpression {$$ = new AndExpression($1,$3);}
                         ;
 
 EqualityExpression:     // e.g. x == y || x != y
@@ -267,14 +273,14 @@ UnaryOperator:          // e.g. ++ || ! || ~
                         ;
 
 PrimaryExpression:      // e.g. a || 4 || ()
-                        T_IDENTIFIER {$$ = new Identifier($1);}
+                        T_IDENTIFIER {$$ = new Identifier(*$1);}
                         | T_INT_CONST {$$ = new Constant($1);}
                         | T_LB Expression T_RB {$$ = $2;}
                         ;
                         
 
 PostfixExpression:      // e.g. a++
-                        PrimaryExpression {$$ = $1}
+                        PrimaryExpression {$$ = $1;}
                         | PostfixExpression T_INC_OP {$$ = new PostfixExpression("++",$1);}
                         | PostfixExpression T_DEC_OP {$$ = new PostfixExpression("--",$1);}
                         ;

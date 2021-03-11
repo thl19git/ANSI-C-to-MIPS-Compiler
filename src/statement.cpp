@@ -5,10 +5,6 @@
 Statement::Statement(StatementPtr nextStatement) : nextStatement_(nextStatement){
 }
 
-void Statement::print(){
-    //TODO
-}
-
 void Statement::printASM(/*Bindings *bindings*/){
     //TODO
 }
@@ -29,7 +25,10 @@ CompoundStatement::CompoundStatement(StatementPtr statement, DeclarationPtr decl
 }
 
 void CompoundStatement::print(){
-    //TODO
+    if(nextStatement_!=nullptr){
+        nextStatement_->print();
+    }
+    statement_->print();
 }
 
 void CompoundStatement::printASM(/*Bindings *bindings*/){
@@ -44,7 +43,10 @@ ExpressionStatement::ExpressionStatement(ExpressionPtr expression) : Statement()
 }
 
 void ExpressionStatement::print(){
-    //TODO
+    if(nextStatement_!=nullptr){
+        nextStatement_->print();
+    }
+    expression_->print();
 }
 
 void ExpressionStatement::printASM(/*Bindings *bindings*/){
@@ -59,7 +61,20 @@ IfElseStatement::IfElseStatement(ExpressionPtr condition, StatementPtr ifStateme
 }
 
 void IfElseStatement::print(){
-    //TODO
+    if(nextStatement_!=nullptr){
+        nextStatement_->print();
+    }
+    std::cout << "if(";
+    condition_->print();
+    std::cout << "){" << std::endl;
+    ifStatement_->print();
+    std::cout << "}";
+    if(elseStatement_!=nullptr){
+        std::cout << "else{" << std::endl;
+        elseStatement_->print();
+        std::cout << "}";
+    }
+    std::cout << std::endl;
 }
 
 void IfElseStatement::printASM(/*Bindings *bindings*/){
@@ -73,10 +88,6 @@ IterationStatement::IterationStatement(ExpressionPtr condition, StatementPtr sta
 
 }
 
-void IterationStatement::print(){
-    //TODO
-}
-
 void IterationStatement::printASM(/*Bindings *bindings*/){
     //TODO
 }
@@ -85,11 +96,18 @@ void IterationStatement::printASM(/*Bindings *bindings*/){
 // *********** WHILE LOOP CLASS ************ //
 
 WhileLoop::WhileLoop(ExpressionPtr condition, StatementPtr statement) : IterationStatement(condition, statement) {
-    //TODO
+
 }
 
 void WhileLoop::print(){
-    //TODO
+    if(nextStatement_!=nullptr){
+        nextStatement_->print();
+    }
+    std::cout << "while(";
+    condition_->print();
+    std::cout << "){";
+    statement_->print();
+    std::cout << "}" << std::endl;
 }
 
 void WhileLoop::printASM(/*Bindings *bindings*/){
@@ -98,10 +116,6 @@ void WhileLoop::printASM(/*Bindings *bindings*/){
 
 
 // *********** JUMP STATEMENT CLASS ************ //
-
-void JumpStatement::print(){
-    //TODO
-}
 
 void JumpStatement::printASM(/*Bindings *bindings*/){
     //TODO
@@ -115,7 +129,15 @@ ReturnStatement::ReturnStatement(ExpressionPtr expression) : expression_(express
 }
 
 void ReturnStatement::print(){
-    //TODO
+    if(nextStatement_!=nullptr){
+        nextStatement_->print();
+    }
+    std::cout << "return";
+    if(expression_!=nullptr){
+        std::cout << " ";
+        expression_->print();
+        std::cout << std::endl;
+    }
 }
 
 void ReturnStatement::printASM(/*Bindings *bindings*/){

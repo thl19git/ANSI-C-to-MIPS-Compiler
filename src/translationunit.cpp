@@ -5,7 +5,9 @@ TranslationUnit::TranslationUnit(NodePtr node){
 }
 
 void TranslationUnit::print(){
-    //std::cout << "something" << std::endl;
+    for(int i = 0; i < nodes_.size(); i++){
+        nodes_[i]->print();
+    }
 }
 
 void TranslationUnit::printASM(/*Bindings *bindings*/){

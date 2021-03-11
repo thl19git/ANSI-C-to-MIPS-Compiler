@@ -8,6 +8,7 @@
 #include <vector>
 #include <iostream>
 
+class Statement;
 typedef Statement* StatementPtr;
 
 // *********** BASIC STATEMENT CLASS ************ //

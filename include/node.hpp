@@ -1,6 +1,11 @@
 #ifndef node_hpp
 #define node_hpp
 
+#include <iostream>
+
+class Node;
+typedef Node* NodePtr;
+
 class Node {
     public:
         virtual void print() =0;

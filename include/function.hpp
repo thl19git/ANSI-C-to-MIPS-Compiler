@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 
+class Function;
 typedef Node* NodePtr;
 
 class Function : public Node{

@@ -4,6 +4,7 @@
 #include "node.hpp"
 #include <string>
 
+class Expression;
 typedef Expression* ExpressionPtr;
 
 // *********** BASIC EXPRESSION CLASS ************ //
@@ -252,9 +253,10 @@ protected:
     ExpressionPtr nextInitializer_; //if we care about initializer lists
 
 public:
-    Initializer(/*some things*/);
+    Initializer(ExpressionPtr initializer);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
+    ExpressionPtr getNext();
 };
 
 #endif

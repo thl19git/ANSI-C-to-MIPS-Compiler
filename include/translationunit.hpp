@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 
+class TranslationUnit;
 typedef Node* NodePtr;
 
 class TranslationUnit : public Node{
