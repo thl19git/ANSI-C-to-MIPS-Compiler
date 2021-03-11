@@ -59,7 +59,7 @@ class IfElseStatement : public Statement{
 protected:
     ExpressionPtr condition_;
     StatementPtr ifStatement_;
-    StatementPtr elseStatement;
+    StatementPtr elseStatement_;
 
 public:
     IfElseStatement(/*some things*/);
