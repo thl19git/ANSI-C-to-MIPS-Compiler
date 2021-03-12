@@ -79,7 +79,7 @@ protected:
 
 public:
     IterationStatement(ExpressionPtr condition, StatementPtr statement);
-    virtual void print();
+    virtual void print() = 0;
     virtual void printASM(/*Bindings *bindings*/);
 };
 
@@ -102,7 +102,7 @@ class JumpStatement : public Statement{
 protected:
 
 public:
-    virtual void print();
+    virtual void print() = 0;
     virtual void printASM(/*Bindings *bindings*/);
 
 };

@@ -5,14 +5,14 @@ TranslationUnit::TranslationUnit(NodePtr node){
 }
 
 void TranslationUnit::print(){
-    for(int i = 0; i < nodes_.size(); i++){
+    for(unsigned i = 0; i < nodes_.size(); i++){
         nodes_[i]->print();
     }
 }
 
 void TranslationUnit::printASM(/*Bindings *bindings*/){
     //STUFF TO ADD
-    for(int i = 0; i < nodes_.size(); i++){
+    for(unsigned i = 0; i < nodes_.size(); i++){
         nodes_[i]->printASM();
     }
 }

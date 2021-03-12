@@ -28,6 +28,7 @@ void CompoundStatement::print(){
     if(nextStatement_!=nullptr){
         nextStatement_->print();
     }
+    declaration_->print();
     statement_->print();
 }
 

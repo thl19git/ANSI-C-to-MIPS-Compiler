@@ -9,4 +9,4 @@
 #include "declaration.hpp"
 #include "expression.hpp"
 
-#endif AST_HPP
+#endif
