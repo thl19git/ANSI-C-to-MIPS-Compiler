@@ -41,5 +41,6 @@ void IdentifierDeclaration::printASM(/*Bindings *bindings*/){
 }
 
 std::string IdentifierDeclaration::getId(){
+    std::cerr << "Getting declarator ID" << std::endl;
     return id_;
 }

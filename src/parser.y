@@ -65,9 +65,9 @@ TranslationUnit:        // e.g. int foo() {...}
                         ;
                 
 FunctionDefinition:     // e.g. int foo() {...}
-                        TypeSpecifier Declarator CompoundStatement {std::cerr << "trying to build a function" << std::endl; $$ = new Function(*$1,$2->getId(),$3); std::cerr << "function definition = type name compoundstatement" << std::endl;}
+                        TypeSpecifier Declarator CompoundStatement {std::cerr << "trying to build a function" << std::endl; $$ = new Function(*$1,$2->getId(),$3); std::cerr << "function definition = type name compoundstatement" << std::endl;}  //fails due to invalid read
                         ;
-
+                        
 CompoundStatement:      // e.g. {int x = 5; return x + 3;}
                         T_LCB T_RCB {$$ = new CompoundStatement(); std::cerr << "compound statement = {}" << std::endl;}
                         | T_LCB StatementList T_RCB {$$ = new CompoundStatement($2,NULL); std::cerr << "compound statement = {statement list}" << std::endl;}
@@ -83,7 +83,7 @@ DeclarationList:        // e.g. int x; int y = 5;
 Declaration:            // e.g int x; || int x = 5;
                         TypeSpecifier InitDeclaratorList T_SEMICOLON {$$ = $2;
                                                                       Declaration* temp = $2;
-                                                                      while(temp->getNext()!=nullptr){
+                                                                      while(temp!=nullptr){ //uses an uninitialized value;
                                                                         temp->setType(*$1);
                                                                         temp = temp->getNext();
                                                                       }
@@ -106,7 +106,7 @@ Declarator:             // e.g. a || sum
                         ;
 
 DirectDeclarator:       // e.g. a || sum
-                        T_IDENTIFIER {$$ = new IdentifierDeclaration(*$1); std::cerr << "direct declarator = identifer" << std::endl;}
+                        T_IDENTIFIER {$$ = new IdentifierDeclaration(*$1,NULL); std::cerr << "direct declarator = identifer "<< *$1 << std::endl;} //some uninitialized value is created here
                         | T_LB Declarator T_RB {$$ = $2; std::cerr << "direct declarator = (declarator)" << std::endl;}
                         | DirectDeclarator T_LB T_RB {$$ = $1;  std::cerr << "direct declarator = direct declarator ()" << std::endl;}
                         ;
