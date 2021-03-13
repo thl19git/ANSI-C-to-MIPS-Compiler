@@ -361,7 +361,7 @@ void Constant::print(){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
-    std::cout << value_ << std::endl;
+    std::cout << " " << value_ << std::endl;
 }
 
 void Constant::printASM(/*Bindings *bindings*/){

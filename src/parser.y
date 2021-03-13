@@ -65,7 +65,7 @@ TranslationUnit:        // e.g. int foo() {...}
                         ;
                 
 FunctionDefinition:     // e.g. int foo() {...}
-                        TypeSpecifier Declarator CompoundStatement {std::cerr << "trying to build a function" << std::endl; $$ = new Function(*$1,$2->getId(),$3); std::cerr << "function definition = type name compoundstatement" << std::endl;}  //fails due to invalid read
+                        TypeSpecifier Declarator CompoundStatement {std::cerr << "trying to build a function " << std::endl; $$ = new Function(/**$1*/"int",$2->getId(),$3); std::cerr << "function definition = type name compoundstatement" << std::endl;}  //fails due to invalid read
                         ;
                         
 CompoundStatement:      // e.g. {int x = 5; return x + 3;}
@@ -87,7 +87,7 @@ Declaration:            // e.g int x; || int x = 5;
                                                                         temp->setType(*$1);
                                                                         temp = temp->getNext();
                                                                       }
-                                                                      std::cerr << "declaration = type, init declarator list" << std::endl;}
+                                                                      std::cerr << "declaration = type " << *$1 << " init declarator list" << std::endl;}
                         ;
 
 
@@ -124,7 +124,7 @@ InitializerList:        // e.g. a || a,b
 
 StatementList:          // e.g. a = 5; return a;
                         Statement {$$ = $1; std::cerr << "statement list = statement" << std::endl;}
-                        | StatementList Statement {$$->linkStatement($2);  std::cerr << "adding statement to list" << std::endl;}
+                        | StatementList Statement {$2->linkStatement($$); $$ = $2;  std::cerr << "adding statement to list" << std::endl;}
                         ;
 
 Statement:              // e.g. a = 5; || return 7; || {int x = 5; return x + 3;}
@@ -287,7 +287,7 @@ UnaryOperator:          // e.g. ++ || ! || ~
 
 PrimaryExpression:      // e.g. a || 4 || ()
                         T_IDENTIFIER {$$ = new Identifier(*$1); std::cerr << "identifier" << std::endl;}
-                        | T_INT_CONST {$$ = new Constant($1); std::cerr << "integer constant" << std::endl;}
+                        | T_INT_CONST {$$ = new Constant($1); std::cerr << "integer constant " << $1 << std::endl;}
                         | T_LB Expression T_RB {$$ = $2; std::cerr << "Expression in brackets" << std::endl;}
                         ;
                         
@@ -313,7 +313,7 @@ AssignmentOperator:     // e.g +=
                         ;
 
 TypeSpecifier:          // e.g. int
-                        T_INT {$$ = $1; std::cerr << "int"<<std::endl;}
+                        T_INT {$$ = new std::string("int"); std::cerr << "int"<<std::endl;}
                         ;
 
 %%

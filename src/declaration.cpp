@@ -33,7 +33,11 @@ void IdentifierDeclaration::print(){
     if(nextDeclaration_!=nullptr){
         nextDeclaration_->print();
     }
-    std::cout << id_ << " ";
+    std::cout <<" " << type_ << " " << id_ << " ";
+    if(initializer_!=nullptr){
+        std::cout << "=";
+        initializer_->print();
+    }
 }
 
 void IdentifierDeclaration::printASM(/*Bindings *bindings*/){

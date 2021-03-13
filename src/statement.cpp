@@ -28,8 +28,14 @@ void CompoundStatement::print(){
     if(nextStatement_!=nullptr){
         nextStatement_->print();
     }
-    declaration_->print();
-    statement_->print();
+    
+    if(declaration_!=nullptr){
+        declaration_->print();
+    }
+    
+    if(statement_!=nullptr){
+        statement_->print();
+    }
 }
 
 void CompoundStatement::printASM(/*Bindings *bindings*/){
