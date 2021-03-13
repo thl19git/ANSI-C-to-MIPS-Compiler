@@ -113,10 +113,6 @@ MultiplicativeExpression::MultiplicativeExpression(ExpressionPtr left, std::stri
 }
 
 void MultiplicativeExpression::print(){
-    //TODO
-}
-
-void MultiplicativeExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -124,6 +120,10 @@ void MultiplicativeExpression::printASM(/*Bindings *bindings*/){
     std::cout << " " << op_ << " ";
     right_->print();
     std::cout << std::endl;
+}
+
+void MultiplicativeExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 // *********** SHIFT EXPRESSION CLASS ************ //
@@ -133,10 +133,6 @@ ShiftExpression::ShiftExpression(ExpressionPtr left, std::string op, ExpressionP
 }
 
 void ShiftExpression::print(){
-    //TODO
-}
-
-void ShiftExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -144,6 +140,10 @@ void ShiftExpression::printASM(/*Bindings *bindings*/){
     std::cout << " " << op_ << " ";
     right_->print();
     std::cout << std::endl;
+}
+
+void ShiftExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -154,10 +154,6 @@ RelationalExpression::RelationalExpression(ExpressionPtr left, std::string op, E
 }
 
 void RelationalExpression::print(){
-    //TODO
-}
-
-void RelationalExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -165,6 +161,10 @@ void RelationalExpression::printASM(/*Bindings *bindings*/){
     std::cout << " " << op_ << " ";
     right_->print();
     std::cout << std::endl;
+}
+
+void RelationalExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -175,10 +175,6 @@ EqualityExpression::EqualityExpression(ExpressionPtr left, std::string op, Expre
 }
 
 void EqualityExpression::print(){
-    //TODO
-}
-
-void EqualityExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -186,6 +182,10 @@ void EqualityExpression::printASM(/*Bindings *bindings*/){
     std::cout << " " << op_ << " ";
     right_->print();
     std::cout << std::endl;
+}
+
+void EqualityExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -196,10 +196,6 @@ LogicalOrExpression::LogicalOrExpression(ExpressionPtr left, ExpressionPtr right
 }
 
 void LogicalOrExpression::print(){
-    //TODO
-}
-
-void LogicalOrExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -207,6 +203,10 @@ void LogicalOrExpression::printASM(/*Bindings *bindings*/){
     std::cout << " || ";
     right_->print();
     std::cout << std::endl;
+}
+
+void LogicalOrExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -217,10 +217,6 @@ LogicalAndExpression::LogicalAndExpression(ExpressionPtr left, ExpressionPtr rig
 }
 
 void LogicalAndExpression::print(){
-    //TODO
-}
-
-void LogicalAndExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -228,6 +224,10 @@ void LogicalAndExpression::printASM(/*Bindings *bindings*/){
     std::cout << " && ";
     right_->print();
     std::cout << std::endl;
+}
+
+void LogicalAndExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -238,10 +238,6 @@ InclusiveOrExpression::InclusiveOrExpression(ExpressionPtr left, ExpressionPtr r
 }
 
 void InclusiveOrExpression::print(){
-    //TODO
-}
-
-void InclusiveOrExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -249,6 +245,10 @@ void InclusiveOrExpression::printASM(/*Bindings *bindings*/){
     std::cout << " | ";
     right_->print();
     std::cout << std::endl;
+}
+
+void InclusiveOrExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -259,10 +259,6 @@ ExclusiveOrExpression::ExclusiveOrExpression(ExpressionPtr left, ExpressionPtr r
 }
 
 void ExclusiveOrExpression::print(){
-    //TODO
-}
-
-void ExclusiveOrExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -270,6 +266,10 @@ void ExclusiveOrExpression::printASM(/*Bindings *bindings*/){
     std::cout << " ^ ";
     right_->print();
     std::cout << std::endl;
+}
+
+void ExclusiveOrExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -280,10 +280,6 @@ AndExpression::AndExpression(ExpressionPtr left, ExpressionPtr right) : BinaryEx
 }
 
 void AndExpression::print(){
-    //TODO
-}
-
-void AndExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
@@ -291,6 +287,10 @@ void AndExpression::printASM(/*Bindings *bindings*/){
     std::cout << " & ";
     right_->print();
     std::cout << std::endl;
+}
+
+void AndExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -301,16 +301,16 @@ UnaryOpExpression::UnaryOpExpression(std::string op, ExpressionPtr unaryExpressi
 }
 
 void UnaryOpExpression::print(){
-    //TODO
-}
-
-void UnaryOpExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
     std::cout << op_ << " ";
     unaryExpression_->print();
     std::cout << std::endl;
+}
+
+void UnaryOpExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
@@ -321,15 +321,15 @@ PostfixExpression::PostfixExpression(std::string op, ExpressionPtr postfixExpres
 }
 
 void PostfixExpression::print(){
-    //TODO
-}
-
-void PostfixExpression::printASM(/*Bindings *bindings*/){
     if(nextExpression_!=nullptr){
         nextExpression_->print();
     }
     postfixExpression_->print();
     std::cout << op_ << std::endl;
+}
+
+void PostfixExpression::printASM(/*Bindings *bindings*/){
+    //TODO
 }
 
 
