@@ -1,7 +1,7 @@
 #include "../include/function.hpp"
 
 Function::Function(std::string type, std::string name, StatementPtr statement) : name_(name), type_(type), statement_(statement){
-    std::cerr << "In function constructor" << std::endl;
+
 }
 
 void Function::print(){
