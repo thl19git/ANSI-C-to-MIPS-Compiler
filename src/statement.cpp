@@ -2,39 +2,23 @@
 
 // *********** BASIC STATEMENT CLASS ************ //
 
-Statement::Statement(StatementPtr nextStatement) : nextStatement_(nextStatement){
+Statement::Statement(){
 }
 
 void Statement::printASM(/*Bindings *bindings*/){
     //TODO
 }
 
-void Statement::linkStatement(StatementPtr statement){
-    nextStatement_ = statement;
-}
-
 
 // ************ COMPOUND STATEMENT CLASS ************ //
 
-CompoundStatement::CompoundStatement(StatementPtr statement) : Statement(), statement_(statement) {
-
-}
-
-CompoundStatement::CompoundStatement(StatementPtr statement, DeclarationPtr declaration) : Statement(), statement_(statement), declaration_(declaration) {
+CompoundStatement::CompoundStatement(BlockItemPtr blockList) : blockList_(blockList) {
 
 }
 
 void CompoundStatement::print(){
-    if(nextStatement_!=nullptr){
-        nextStatement_->print();
-    }
-    
-    if(declaration_!=nullptr){
-        declaration_->print();
-    }
-    
-    if(statement_!=nullptr){
-        statement_->print();
+    if(blockList_!=nullptr){
+        blockList_->print();
     }
 }
 
@@ -45,14 +29,11 @@ void CompoundStatement::printASM(/*Bindings *bindings*/){
 
 // ************ EXPRESSION STATEMENT CLASS ************ //
 
-ExpressionStatement::ExpressionStatement(ExpressionPtr expression) : Statement(), expression_(expression) {
+ExpressionStatement::ExpressionStatement(ExpressionPtr expression) : expression_(expression) {
 
 }
 
 void ExpressionStatement::print(){
-    if(nextStatement_!=nullptr){
-        nextStatement_->print();
-    }
     expression_->print();
 }
 
@@ -63,14 +44,11 @@ void ExpressionStatement::printASM(/*Bindings *bindings*/){
 
 // *********** IF ELSE STATEMENT CLASS ************ //
 
-IfElseStatement::IfElseStatement(ExpressionPtr condition, StatementPtr ifStatement, StatementPtr elseStatement) : Statement(), condition_(condition), ifStatement_(ifStatement), elseStatement_(elseStatement) {
+IfElseStatement::IfElseStatement(ExpressionPtr condition, StatementPtr ifStatement, StatementPtr elseStatement) : condition_(condition), ifStatement_(ifStatement), elseStatement_(elseStatement) {
 
 }
 
 void IfElseStatement::print(){
-    if(nextStatement_!=nullptr){
-        nextStatement_->print();
-    }
     std::cout << "if(";
     condition_->print();
     std::cout << "){" << std::endl;
@@ -91,7 +69,7 @@ void IfElseStatement::printASM(/*Bindings *bindings*/){
 
 // *********** ITERATION STATEMENT CLASS ************ //
 
-IterationStatement::IterationStatement(ExpressionPtr condition, StatementPtr statement) : Statement(), condition_(condition), statement_(statement) {
+IterationStatement::IterationStatement(ExpressionPtr condition, StatementPtr statement) : condition_(condition), statement_(statement) {
 
 }
 
@@ -107,9 +85,6 @@ WhileLoop::WhileLoop(ExpressionPtr condition, StatementPtr statement) : Iteratio
 }
 
 void WhileLoop::print(){
-    if(nextStatement_!=nullptr){
-        nextStatement_->print();
-    }
     std::cout << "while(";
     condition_->print();
     std::cout << "){";
@@ -136,9 +111,6 @@ ReturnStatement::ReturnStatement(ExpressionPtr expression) : expression_(express
 }
 
 void ReturnStatement::print(){
-    if(nextStatement_!=nullptr){
-        nextStatement_->print();
-    }
     std::cout << "return";
     if(expression_!=nullptr){
         std::cout << " ";

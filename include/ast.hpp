@@ -8,5 +8,6 @@
 #include "statement.hpp"
 #include "declaration.hpp"
 #include "expression.hpp"
+#include "block_item.hpp"
 
 #endif

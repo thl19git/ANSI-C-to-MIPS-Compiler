@@ -19,6 +19,7 @@
   Statement* statement;
   Expression* expression;
   Declaration* declaration;
+  BlockItem* block;
 }
 
 %define parse.error verbose
@@ -44,7 +45,9 @@
 
 %type <function> FunctionDefinition
 
-%type <statement> Statement StatementList IterationStatment JumpStatement ExpressionStatement SelectionStatement CompoundStatement
+%type <block> BlockItem BlockItemList
+
+%type <statement> Statement IterationStatment JumpStatement ExpressionStatement SelectionStatement CompoundStatement
 
 %type <expression> Expression PrimaryExpression PostfixExpression ConditionalExpression UnaryExpression Initializer InitializerList
                    AdditiveExpression MultiplicativeExpression ShiftExpression LogicalAndExpression LogicalOrExpression ExclusiveOrExpression
@@ -69,10 +72,17 @@ FunctionDefinition:     // e.g. int foo() {...}
                         ;
                         
 CompoundStatement:      // e.g. {int x = 5; return x + 3;}
-                        T_LCB T_RCB {$$ = new CompoundStatement();/* std::cerr << "compound statement = {}" << std::endl;*/}
-                        | T_LCB StatementList T_RCB {$$ = new CompoundStatement($2,NULL);/* std::cerr << "compound statement = {statement list}" << std::endl;*/}
-                        | T_LCB DeclarationList T_RCB {$$ = new CompoundStatement(NULL,$2);/* std::cerr << "compound statement = {declaration list}" << std::endl;*/}
-                        | T_LCB DeclarationList StatementList T_RCB {$$ = new CompoundStatement($3,$2);/* std::cerr << "compound statement = {declaration list, statement list}" << std::endl;*/}
+                        T_LCB T_RCB {$$ = new CompoundStatement(NULL);/* std::cerr << "compound statement = {}" << std::endl;*/}
+                        | T_LCB BlockItemList T_RCB {$$ = new CompoundStatement($2);/* std::cerr << "compound statement = {block item list}" << std::endl;*/}
+                        ;
+
+BlockItemList:          // e.g. int x = 3; while(...){...}
+                        BlockItem {$$ = $1;}
+                        | BlockItemList BlockItem {$2->linkBlock($$); $$ = $2;}
+
+BlockItem:              // e.g. int x = 3 || while(...){...}
+                        Declaration {$$ = new BlockItem($1);}
+                        | Statement {$$ = new BlockItem($1);}
                         ;
 
 DeclarationList:        // e.g. int x; int y = 5;
@@ -120,11 +130,6 @@ Initializer:            // e.g. a || b = 2
 InitializerList:        // e.g. a || a,b
                         Initializer {$$ = $1;/* std::cerr << "initializer list = initializer" << std::endl;*/}
                         | InitializerList T_COMMA Initializer {$3->linkExpression($$); $$ = $3;/* std::cerr << "adding initializer to list" << std::endl;*/}
-                        ;
-
-StatementList:          // e.g. a = 5; return a;
-                        Statement {$$ = $1;/* std::cerr << "statement list = statement" << std::endl;*/}
-                        | StatementList Statement {$2->linkStatement($$); $$ = $2;/*  std::cerr << "adding statement to list" << std::endl;*/}
                         ;
 
 Statement:              // e.g. a = 5; || return 7; || {int x = 5; return x + 3;}

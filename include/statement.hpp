@@ -5,6 +5,7 @@
 #include "statement.hpp"
 #include "declaration.hpp"
 #include "expression.hpp"
+#include "block_item.hpp"
 #include <vector>
 #include <iostream>
 
@@ -15,13 +16,11 @@ typedef Statement* StatementPtr;
 
 class Statement : public Node{
 protected:
-    StatementPtr nextStatement_;
 
 public:
-    Statement(StatementPtr nextStatement = nullptr);
+    Statement();
     virtual void print() = 0;
     virtual void printASM(/*Bindings *bindings*/) = 0;
-    void linkStatement(StatementPtr statement);
 };
 
 
@@ -29,12 +28,10 @@ public:
 
 class CompoundStatement : public Statement{
 protected:
-    StatementPtr statement_;
-    DeclarationPtr declaration_;
+    BlockItemPtr blockList_;
 
 public:
-    CompoundStatement(StatementPtr statement);
-    CompoundStatement(StatementPtr statement = nullptr, DeclarationPtr declaration = nullptr);
+    CompoundStatement(BlockItemPtr blockList);
     virtual void print();
     virtual void printASM(/*Bindings *bindings*/);
 

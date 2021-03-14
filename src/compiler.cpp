@@ -20,11 +20,11 @@ int main(int argc, char* argv[]){
         throw std::runtime_error("Unable to open source file");
     }
 
-    output.open(argv[4]);
+    //output.open(argv[4]);
 
-    if(!output.is_open()){
-        throw std::runtime_error("Unable to open output file");
-    }
+    //if(!output.is_open()){
+    //    throw std::runtime_error("Unable to open output file");
+    //}
 
     yyset_in(sourceFile);
 
@@ -39,5 +39,5 @@ int main(int argc, char* argv[]){
 
     std::cout << "Printed AST, ending program" << std::endl;
 
-    output.close();
+    //output.close();
 }
