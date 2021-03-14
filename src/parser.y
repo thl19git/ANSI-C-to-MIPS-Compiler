@@ -85,6 +85,7 @@ BlockItem:              // e.g. int x = 3 || while(...){...}
                         | Statement {$$ = new BlockItem($1);}
                         ;
 
+//THE FOLLOWING IS CURRENTLY USELESS, BUT KEPT FOR LATER
 DeclarationList:        // e.g. int x; int y = 5;
                         Declaration {$$ = $1;/* std::cerr << "declaration list = declaration" << std::endl;*/}
                         | DeclarationList Declaration {$2->linkDeclaration($$); $$ = $2;/*  std::cerr << "adding declaration to list" << std::endl;*/} //may need to switch $$ and $2 - switched
