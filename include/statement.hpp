@@ -14,7 +14,7 @@ typedef Statement* StatementPtr;
 
 // *********** BASIC STATEMENT CLASS ************ //
 
-class Statement : public Node{
+class Statement : public BlockItem{
 protected:
 
 public:

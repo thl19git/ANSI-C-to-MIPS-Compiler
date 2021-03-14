@@ -3,13 +3,14 @@
 
 #include "node.hpp"
 #include "expression.hpp"
+#include "block_item.hpp"
 
 class Declaration;
 typedef Declaration* DeclarationPtr;
 
 // *********** BASIC DECLARATION CLASS ************ //
 
-class Declaration : public Node {
+class Declaration : public BlockItem {
 protected:
     ExpressionPtr initializer_;
     std::string type_;

@@ -17,6 +17,9 @@ CompoundStatement::CompoundStatement(BlockItemPtr blockList) : blockList_(blockL
 }
 
 void CompoundStatement::print(){
+    if(nextBlock_!=nullptr){
+        nextBlock_->print();
+    }
     if(blockList_!=nullptr){
         blockList_->print();
     }
@@ -34,6 +37,9 @@ ExpressionStatement::ExpressionStatement(ExpressionPtr expression) : expression_
 }
 
 void ExpressionStatement::print(){
+    if(nextBlock_!=nullptr){
+        nextBlock_->print();
+    }
     expression_->print();
 }
 
@@ -49,6 +55,9 @@ IfElseStatement::IfElseStatement(ExpressionPtr condition, StatementPtr ifStateme
 }
 
 void IfElseStatement::print(){
+    if(nextBlock_!=nullptr){
+        nextBlock_->print();
+    }
     std::cout << "if(";
     condition_->print();
     std::cout << "){" << std::endl;
@@ -85,6 +94,9 @@ WhileLoop::WhileLoop(ExpressionPtr condition, StatementPtr statement) : Iteratio
 }
 
 void WhileLoop::print(){
+    if(nextBlock_!=nullptr){
+        nextBlock_->print();
+    }
     std::cout << "while(";
     condition_->print();
     std::cout << "){";
@@ -111,6 +123,9 @@ ReturnStatement::ReturnStatement(ExpressionPtr expression) : expression_(express
 }
 
 void ReturnStatement::print(){
+    if(nextBlock_!=nullptr){
+        nextBlock_->print();
+    }
     std::cout << "return";
     if(expression_!=nullptr){
         std::cout << " ";

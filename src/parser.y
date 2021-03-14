@@ -81,8 +81,8 @@ BlockItemList:          // e.g. int x = 3; while(...){...}
                         | BlockItemList BlockItem {$2->linkBlock($$); $$ = $2;}
 
 BlockItem:              // e.g. int x = 3 || while(...){...}
-                        Declaration {$$ = new BlockItem($1);}
-                        | Statement {$$ = new BlockItem($1);}
+                        Declaration {$$ = $1;}
+                        | Statement {$$ = $1;}
                         ;
 
 //THE FOLLOWING IS CURRENTLY USELESS, BUT KEPT FOR LATER

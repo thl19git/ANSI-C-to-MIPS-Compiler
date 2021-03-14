@@ -30,6 +30,9 @@ IdentifierDeclaration::IdentifierDeclaration(std::string id, ExpressionPtr initi
 }
 
 void IdentifierDeclaration::print(){
+    if(nextBlock_!=nullptr){
+        nextBlock_->print();
+    }
     if(nextDeclaration_!=nullptr){
         nextDeclaration_->print();
     }

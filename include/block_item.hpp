@@ -9,12 +9,11 @@ typedef BlockItem* BlockItemPtr;
 
 class BlockItem : public Node {
 protected:
-    NodePtr block_;
     BlockItemPtr nextBlock_;
 public:
-    BlockItem(NodePtr block = nullptr);
-    void print();
-    void printASM(/*Bindings* bindings*/);
+    BlockItem();
+    virtual void print()=0;
+    virtual void printASM(/*Bindings* bindings*/)=0;
     void linkBlock(BlockItemPtr nextBlock);
     BlockItemPtr getNext();
 };
