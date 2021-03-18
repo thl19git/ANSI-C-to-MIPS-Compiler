@@ -4,6 +4,7 @@
 #include "node.hpp"
 #include <vector>
 #include <iostream>
+#include "bindings.hpp"
 
 class TranslationUnit;
 typedef Node* NodePtr;
@@ -15,7 +16,7 @@ protected:
 public:
     TranslationUnit(NodePtr node);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
     void append(NodePtr node);
 };
 

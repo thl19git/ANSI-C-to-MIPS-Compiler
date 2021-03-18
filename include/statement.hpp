@@ -8,6 +8,7 @@
 #include "block_item.hpp"
 #include <vector>
 #include <iostream>
+#include "bindings.hpp"
 
 class Statement;
 typedef Statement* StatementPtr;
@@ -20,7 +21,9 @@ protected:
 public:
     Statement();
     virtual void print() = 0;
-    virtual void printASM(/*Bindings *bindings*/) = 0;
+    virtual Bindings printASM(Bindings bindings) = 0;
+    virtual void countVariables(int &count) = 0;
+    virtual void countTemps(int &count) = 0;
 };
 
 
@@ -33,7 +36,9 @@ protected:
 public:
     CompoundStatement(BlockItemPtr blockList);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
 
 };
 
@@ -47,7 +52,9 @@ protected:
 public:
     ExpressionStatement(ExpressionPtr expression = nullptr);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
 
 };
 
@@ -63,7 +70,9 @@ protected:
 public:
     IfElseStatement(ExpressionPtr condition, StatementPtr ifStatement, StatementPtr elseStatement = nullptr);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
 };
 
 
@@ -77,7 +86,9 @@ protected:
 public:
     IterationStatement(ExpressionPtr condition, StatementPtr statement);
     virtual void print() = 0;
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings) = 0;
+    virtual void countVariables(int &count) = 0;
+    virtual void countTemps(int &count) = 0;
 };
 
 
@@ -89,7 +100,9 @@ protected:
 public:
     WhileLoop(ExpressionPtr condition, StatementPtr statement);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
 };
 
 
@@ -100,7 +113,9 @@ protected:
 
 public:
     virtual void print() = 0;
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings) = 0;
+    virtual void countVariables(int &count) = 0;
+    virtual void countTemps(int &count) = 0;
 
 };
 
@@ -114,7 +129,9 @@ protected:
 public:
     ReturnStatement(ExpressionPtr expression = nullptr);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
 };
 
 #endif

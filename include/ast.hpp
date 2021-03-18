@@ -9,5 +9,6 @@
 #include "declaration.hpp"
 #include "expression.hpp"
 #include "block_item.hpp"
+#include "bindings.hpp"
 
 #endif

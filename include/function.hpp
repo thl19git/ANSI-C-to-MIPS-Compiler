@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include "bindings.hpp"
 
 class Function;
 typedef Node* NodePtr;
@@ -21,7 +22,7 @@ protected:
 public:
     Function(std::string type, std::string name, StatementPtr statement);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 #endif

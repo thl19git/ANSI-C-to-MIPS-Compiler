@@ -7,6 +7,7 @@ Node* parseAST();
 extern void yyset_in(FILE *fd);
 
 std::ofstream output;
+int labelCount = 0;
 
 int main(int argc, char* argv[]){
 
@@ -20,11 +21,11 @@ int main(int argc, char* argv[]){
         throw std::runtime_error("Unable to open source file");
     }
 
-    //output.open(argv[4]);
+    output.open(argv[4]);
 
-    //if(!output.is_open()){
-    //    throw std::runtime_error("Unable to open output file");
-    //}
+    if(!output.is_open()){
+        throw std::runtime_error("Unable to open output file");
+    }
 
     yyset_in(sourceFile);
 
@@ -32,12 +33,20 @@ int main(int argc, char* argv[]){
 
     Node* ast = parseAST();
 
-    std::cout << "Printing AST" << std::endl;
+    std::cout << "Printing Assembly" << std::endl;
 
-    ast->print();
-    //ast->printASM();
+    //ast->print();
 
-    std::cout << "Printed AST, ending program" << std::endl;
+    Bindings bindings;
 
-    //output.close();
+    try{
+        bindings = ast->printASM(bindings);
+    }
+    catch(std::exception& e){
+        std::cerr << "Exception: " << e.what() << std::endl;
+    }
+
+    std::cout << "Printed assembly, ending program" << std::endl;
+
+    output.close();
 }

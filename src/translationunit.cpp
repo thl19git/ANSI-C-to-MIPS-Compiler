@@ -10,11 +10,11 @@ void TranslationUnit::print(){
     }
 }
 
-void TranslationUnit::printASM(/*Bindings *bindings*/){
-    //STUFF TO ADD
+Bindings TranslationUnit::printASM(Bindings bindings){
     for(unsigned i = 0; i < nodes_.size(); i++){
-        nodes_[i]->printASM();
+        bindings = nodes_[i]->printASM(bindings);
     }
+    return bindings;
 }
 
 void TranslationUnit::append(NodePtr node){

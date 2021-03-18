@@ -4,6 +4,7 @@
 #include "node.hpp"
 #include "expression.hpp"
 #include "block_item.hpp"
+#include "bindings.hpp"
 
 class Declaration;
 typedef Declaration* DeclarationPtr;
@@ -19,12 +20,14 @@ protected:
 public:
     Declaration(ExpressionPtr initializer);
     virtual void print() = 0;
-    virtual void printASM(/*Bindings *bindings*/) = 0;
+    virtual Bindings printASM(Bindings bindings) = 0;
     void linkDeclaration(DeclarationPtr declaration);
     void setType(std::string type);
     DeclarationPtr getNext();
     void setInitializer(ExpressionPtr initializer);
     virtual std::string getId() = 0;
+    virtual void countVariables(int &count) = 0;
+    virtual void countTemps(int &count) = 0;
 
 };
 
@@ -38,8 +41,10 @@ protected:
 public:
     IdentifierDeclaration(std::string id, ExpressionPtr initializer = nullptr);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
     virtual std::string getId();
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
 };
 
 #endif

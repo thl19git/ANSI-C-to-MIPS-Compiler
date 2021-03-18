@@ -5,7 +5,7 @@
 Statement::Statement(){
 }
 
-void Statement::printASM(/*Bindings *bindings*/){
+Bindings Statement::printASM(Bindings bindings){
     //TODO
 }
 
@@ -25,8 +25,35 @@ void CompoundStatement::print(){
     }
 }
 
-void CompoundStatement::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings CompoundStatement::printASM(Bindings bindings){
+    Bindings initialBindings = bindings;
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+    if(blockList_!=nullptr){
+        blockList_->printASM(bindings);
+    }
+    return initialBindings;
+}
+
+void CompoundStatement::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }
+    if(blockList_!=nullptr){
+        blockList_->countVariables(count);
+    }
+}
+
+void CompoundStatement::countTemps(int &count){
+    int tmpNextBlock = 0, tmpBlockList = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    if(blockList_!=nullptr){
+        blockList_->countTemps(tmpBlockList);
+    }
+    count = std::max(tmpNextBlock,tmpBlockList);
 }
 
 
@@ -43,8 +70,29 @@ void ExpressionStatement::print(){
     expression_->print();
 }
 
-void ExpressionStatement::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings ExpressionStatement::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+    if(expression_!=nullptr){
+        expression_->printASM(bindings);
+    }
+    return bindings;
+}
+
+void ExpressionStatement::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }
+}
+
+void ExpressionStatement::countTemps(int &count){
+    int tmpNextBlock = 0, tmpExpression = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    expression_->countTemps(tmpExpression);
+    count = std::max(tmpNextBlock,tmpExpression);
 }
 
 
@@ -71,8 +119,63 @@ void IfElseStatement::print(){
     std::cout << std::endl;
 }
 
-void IfElseStatement::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings IfElseStatement::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+
+    int ifLabel = labelCount++;
+
+    //print assembly for the condition
+    condition_->printASM(bindings);
+    output << "beq $2,$0,$" << ifLabel << "else" << std::endl;
+    output << "nop" << std::endl;
+
+    //print assembly for if statement
+    ifStatement_->printASM(bindings);
+
+    output << "b $" << ifLabel << "ifend" << std::endl;
+    output << "nop" << std::endl << "$" << ifLabel << "else:" << std::endl;
+
+    //print assembly for else statement
+    if(elseStatement_!=nullptr){
+        elseStatement_->printASM(bindings);
+    }
+
+    output << "$" << ifLabel << "ifend:" << std::endl;
+
+    return bindings;
+}
+
+void IfElseStatement::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }
+    if(ifStatement_!=nullptr){
+        ifStatement_->countVariables(count);
+    }
+    if(elseStatement_!=nullptr){
+        elseStatement_->countVariables(count);
+    }
+}
+
+void IfElseStatement::countTemps(int &count){
+    int tmpNextBlock = 0, tmpCondition = 0, tmpIf = 0, tmpElse = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    if(condition_!=nullptr){
+        condition_->countTemps(tmpCondition);
+    }
+    if(ifStatement_!=nullptr){
+        ifStatement_->countTemps(tmpIf);
+    }
+    if(elseStatement_!=nullptr){
+        elseStatement_->countTemps(tmpElse);
+    }
+
+    count = std::max(tmpNextBlock,std::max(tmpCondition,std::max(tmpIf,tmpElse)));
+
 }
 
 
@@ -80,10 +183,6 @@ void IfElseStatement::printASM(/*Bindings *bindings*/){
 
 IterationStatement::IterationStatement(ExpressionPtr condition, StatementPtr statement) : condition_(condition), statement_(statement) {
 
-}
-
-void IterationStatement::printASM(/*Bindings *bindings*/){
-    //TODO
 }
 
 
@@ -104,16 +203,56 @@ void WhileLoop::print(){
     std::cout << "}" << std::endl;
 }
 
-void WhileLoop::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings WhileLoop::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+
+    int whileLabel = labelCount++;
+
+    //output assembly
+
+    output << "b $" << whileLabel << "whilecond" << std:: endl;
+    output << "nop" << std::endl;
+
+    output << "$" << whileLabel << "whilebody:" << std::endl; 
+    statement_->printASM(bindings);
+
+    output << "$" << whileLabel << "whilecond:" << std::endl;
+    condition_->printASM(bindings);
+
+    output << "bne $2,$0,$" << whileLabel << "whilebody" << std::endl;
+    output << "nop" << std::endl;
+
+    return bindings;
 }
 
+void WhileLoop::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }
+    if(statement_!=nullptr){
+        statement_->countVariables(count);
+    }    
+}
+
+void WhileLoop::countTemps(int &count){
+    int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    if(condition_!=nullptr){
+        condition_->countTemps(tmpCondition);
+    }
+    if(statement_!=nullptr){
+        statement_->countTemps(tmpStatement);
+    }
+
+    count = std::max(tmpNextBlock,std::max(tmpCondition, tmpStatement));
+
+}
 
 // *********** JUMP STATEMENT CLASS ************ //
-
-void JumpStatement::printASM(/*Bindings *bindings*/){
-    //TODO
-}
 
 
 // *********** RETURN STATEMENT CLASS ************ //
@@ -134,6 +273,31 @@ void ReturnStatement::print(){
     }
 }
 
-void ReturnStatement::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings ReturnStatement::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+    if(expression_!=nullptr){
+        expression_->printASM(bindings);
+    }
+    output << "j end" << std::endl << "nop" << std::endl;
+    return bindings;
+}
+
+void ReturnStatement::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }    
+}
+
+void ReturnStatement::countTemps(int &count){
+    int tmpNextBlock = 0, tmpExpression = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    if(expression_!=nullptr){
+        expression_->countTemps(tmpExpression);
+    }
+
+    count = std::max(tmpNextBlock,tmpExpression);
 }

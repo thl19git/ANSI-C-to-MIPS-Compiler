@@ -43,10 +43,46 @@ void IdentifierDeclaration::print(){
     }
 }
 
-void IdentifierDeclaration::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings IdentifierDeclaration::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+
+    //puts the initializer in the stack and $2
+    if(initializer_!=nullptr){
+        initializer_->printASM(bindings);
+        bindings.insertBindings(id_, type_);
+        output << "sw $2," << bindings.getStackPos() << "($fp)" << std::endl;
+        bindings.increaseStackPos();
+    } else {
+        bindings.insertBindings(id_, type_);
+        bindings.increaseStackPos();
+    }
+
+
+
+    return bindings;
 }
 
 std::string IdentifierDeclaration::getId(){
     return id_;
+}
+
+void IdentifierDeclaration::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }
+    count++;
+}
+
+void IdentifierDeclaration::countTemps(int &count){
+    int tmpNextBlock = 0, tmpInit = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    if(initializer_!=nullptr){
+        initializer_->countTemps(tmpInit);
+    }
+
+    count = std::max(tmpNextBlock,tmpInit);
 }

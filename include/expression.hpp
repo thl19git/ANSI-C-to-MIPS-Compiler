@@ -3,6 +3,7 @@
 
 #include "node.hpp"
 #include <string>
+#include "bindings.hpp"
 
 class Expression;
 typedef Expression* ExpressionPtr;
@@ -11,12 +12,14 @@ typedef Expression* ExpressionPtr;
 
 class Expression : public Node {
 protected:
-    ExpressionPtr nextExpression_;
+    ExpressionPtr nextExpression_; //only required for initializer lists which we aren't tested on
 public:
-    virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual void print() = 0;
+    virtual Bindings printASM(Bindings bindings) = 0;
     void linkExpression(ExpressionPtr expression);
     ExpressionPtr getNext();
+    virtual void countTemps(int &count) = 0;
+    virtual std::string getId();
 };
 
 
@@ -29,8 +32,10 @@ protected:
 
 public:
     BinaryExpression(ExpressionPtr left, ExpressionPtr right);
-    virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual void print() = 0;
+    virtual Bindings printASM(Bindings bindings) = 0;
+    virtual void countTemps(int &count);
+    void load(Bindings bindings);
 };
 
 
@@ -42,7 +47,8 @@ protected:
 public:
     UnaryExpression(/*some things*/);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count) = 0;
 };
 
 
@@ -55,7 +61,7 @@ protected:
 public:
     AssignmentExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -68,7 +74,7 @@ protected:
 public:
     ConditionalExpression(/*some things*/);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -80,7 +86,7 @@ protected:
 public:
     AdditiveExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -92,7 +98,7 @@ protected:
 public:
     MultiplicativeExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -104,7 +110,7 @@ protected:
 public:
     ShiftExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -116,7 +122,7 @@ protected:
 public:
     RelationalExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -128,7 +134,7 @@ protected:
 public:
     EqualityExpression(ExpressionPtr left, std::string op, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -140,7 +146,7 @@ protected:
 public:
     LogicalOrExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -152,7 +158,7 @@ protected:
 public:
     LogicalAndExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -164,7 +170,7 @@ protected:
 public:
     InclusiveOrExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -176,7 +182,7 @@ protected:
 public:
     ExclusiveOrExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -188,7 +194,7 @@ protected:
 public:
     AndExpression(ExpressionPtr left, ExpressionPtr right);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
 };
 
 
@@ -202,7 +208,8 @@ protected:
 public:
     UnaryOpExpression(std::string op, ExpressionPtr unaryExpression);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count);
 };
 
 
@@ -216,7 +223,8 @@ protected:
 public:
     PostfixExpression(std::string op, ExpressionPtr postfixExpression);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count);
 };
 
 
@@ -229,7 +237,9 @@ protected:
 public:
     Identifier(std::string id);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count);
+    virtual std::string getId();
 };
 
 
@@ -242,7 +252,8 @@ protected:
 public:
     Constant(double value);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count);
 };
 
 
@@ -255,8 +266,9 @@ protected:
 public:
     Initializer(ExpressionPtr initializer);
     virtual void print();
-    virtual void printASM(/*Bindings *bindings*/);
+    virtual Bindings printASM(Bindings bindings);
     ExpressionPtr getNext();
+    virtual void countTemps(int &count);
 };
 
 #endif

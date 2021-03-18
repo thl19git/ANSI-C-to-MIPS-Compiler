@@ -2,20 +2,16 @@
 
 // *********** BASIC EXPRESSION CLASS ************ //
 
-void Expression::print(){
-    //TODO
-}
-
-void Expression::printASM(/*Bindings *bindings*/){
-    //TODO
-}
-
 void Expression::linkExpression(ExpressionPtr expression){
     nextExpression_ = expression;
 }
 
 ExpressionPtr Expression::getNext(){
     return nextExpression_;
+}
+
+std::string Expression::getId(){
+    return "";
 }
 
 
@@ -25,12 +21,31 @@ BinaryExpression::BinaryExpression(ExpressionPtr left, ExpressionPtr right) : le
 
 }
 
-void BinaryExpression::print(){
-    //TODO
+void BinaryExpression::load(Bindings bindings){
+    //print assembly for the left-hand side
+    left_->printASM(bindings);
+
+    //get the stack position of the left-hand side
+    int leftStackPos = bindings.getTempPos();
+
+    //increase temp position for right-hand side
+    bindings.nextTempPos();
+
+    //print assembly for the right-hand side
+    right_->printASM(bindings);
+
+    //load left hand-side into $2 ($v0)
+    output << "lw $2," << leftStackPos << "($fp)" << std::endl;
+
+    //load right hand-side into $3 ($v1)
+    output << "lw $3," << bindings.getTempPos() << "($fp)" << std::endl;
 }
 
-void BinaryExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+void BinaryExpression::countTemps(int &count){
+    int tmpLeft = 0, tmpRight = 0;
+    left_->countTemps(tmpLeft);
+    right_->countTemps(tmpRight);
+    count = tmpLeft + tmpRight + 1;
 }
 
 
@@ -44,8 +59,9 @@ void UnaryExpression::print(){
     //TODO
 }
 
-void UnaryExpression::printASM(/*Bindings *bindings*/){
+Bindings UnaryExpression::printASM(Bindings bindings){
     //TODO
+    return bindings;
 }
 
 
@@ -65,8 +81,24 @@ void AssignmentExpression::print(){
     std::cout << std::endl;
 }
 
-void AssignmentExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings AssignmentExpression::printASM(Bindings bindings){
+    //print assembly for right-hand side, result should be in $2 and on stack
+    right_->printASM(bindings);
+
+    //increase temp stack position
+    bindings.nextTempPos();
+
+    //get left-hand side id
+    std::string leftId = left_->getId();
+
+    //get stack location of left-hand side variable
+    int leftStackPos = bindings.getStackPos(leftId);
+
+    //store $2 in location of left-hand side
+    output << "sw $2," << leftStackPos << "($fp)" << std::endl;
+
+    return bindings;
+
 }
 
 
@@ -80,8 +112,9 @@ void ConditionalExpression::print(){
     //TODO
 }
 
-void ConditionalExpression::printASM(/*Bindings *bindings*/){
+Bindings ConditionalExpression::printASM(Bindings bindings){
     //TODO
+    return bindings;
 }
 
 
@@ -101,8 +134,22 @@ void AdditiveExpression::print(){
     std::cout << std::endl;    
 }
 
-void AdditiveExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings AdditiveExpression::printASM(Bindings bindings){
+    //get left-hand side into $2 and right-hand side into $3
+    load(bindings);
+
+    //output calculation assembly
+    if(op_ == "+"){
+        output << "addu $2,$2,$3" << std::endl;
+    } else if (op_ == "-"){
+        output << "subu $2,$2,$3" << std::endl;
+    }
+
+    //store result on the stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
+
 }
 
 
@@ -122,8 +169,26 @@ void MultiplicativeExpression::print(){
     std::cout << std::endl;
 }
 
-void MultiplicativeExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings MultiplicativeExpression::printASM(Bindings bindings){
+    //get left-hand side into $2 and right-hand side into $3
+    load(bindings);
+
+    //output calculation assembly
+    if(op_ == "*"){
+        output << "mul $2,$2,$3" << std::endl;
+    } else if(op_ == "/" || op_ == "%"){
+        output << "div $2,$3" << std::endl;
+        if(op_ == "/"){
+            output << "mflo $2" << std::endl;
+        } else {
+            output << "mfhi $2" << std::endl; 
+        }
+    }
+
+    //store result on the stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
 }
 
 // *********** SHIFT EXPRESSION CLASS ************ //
@@ -142,8 +207,21 @@ void ShiftExpression::print(){
     std::cout << std::endl;
 }
 
-void ShiftExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings ShiftExpression::printASM(Bindings bindings){
+    //get left-hand side into $2 and right-hand side into $3
+    load(bindings);
+
+    //output calculation assembly
+    if(op_ == "<<"){
+        output << "sll $2,$2,$3" << std::endl;
+    } else if (op_ == ">>"){
+        output << "sra $2,$2,$3" << std::endl;
+    }
+
+    //store result on the stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
 }
 
 
@@ -163,8 +241,28 @@ void RelationalExpression::print(){
     std::cout << std::endl;
 }
 
-void RelationalExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings RelationalExpression::printASM(Bindings bindings){
+    //get left-hand side into $2 and right-hand side into $3
+    load(bindings);
+
+    //output calculation assembly
+    if(op_ == "<"){
+        output << "slt $2,$2,$3" << std::endl;
+    } else if(op_ == ">"){
+        output << "slt $2,$3,$2" << std::endl;
+    } else if(op_ == "<="){
+        output << "slt $2,$3,$2" << std::endl;
+        output << "xori $2,$2,0x1" << std::endl;
+    } else if(op_ == ">="){
+        output << "slt $2,$2,$3" << std::endl;
+        output << "xori $2,$2,0x1" << std::endl;        
+    }
+    output << "andi $2,$2,0x00ff" << std::endl;
+
+    //store result on stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
 }
 
 
@@ -184,8 +282,23 @@ void EqualityExpression::print(){
     std::cout << std::endl;
 }
 
-void EqualityExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings EqualityExpression::printASM(Bindings bindings){
+    //get left-hand side into $2 and right-hand side into $3
+    load(bindings);
+
+    //output calculation assembly
+    output << "xor $2,$2,$3" << std::endl;
+    if(op_ == "=="){
+        output << "slti $2,$2,1" << std::endl;
+    } else if (op_ == "!="){
+        output << "sltu $2,$0,$2" << std::endl;
+    }
+    output << "andi $2,$2,0x00ff" << std::endl;
+
+    //store result on stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
 }
 
 
@@ -205,8 +318,9 @@ void LogicalOrExpression::print(){
     std::cout << std::endl;
 }
 
-void LogicalOrExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings LogicalOrExpression::printASM(Bindings bindings){
+    //TODO - requires a bit more thought
+    return bindings;
 }
 
 
@@ -226,8 +340,9 @@ void LogicalAndExpression::print(){
     std::cout << std::endl;
 }
 
-void LogicalAndExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings LogicalAndExpression::printASM(Bindings bindings){
+    //TODO - requires a bit more thought
+    return bindings;
 }
 
 
@@ -247,8 +362,17 @@ void InclusiveOrExpression::print(){
     std::cout << std::endl;
 }
 
-void InclusiveOrExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings InclusiveOrExpression::printASM(Bindings bindings){
+    //get left-hand side into $2 and right-hand side into $3
+    load(bindings);
+
+    //output calculation assembly
+    output << "or $2,$2,$3" << std::endl;
+
+    //store result on stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
 }
 
 
@@ -268,8 +392,17 @@ void ExclusiveOrExpression::print(){
     std::cout << std::endl;
 }
 
-void ExclusiveOrExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings ExclusiveOrExpression::printASM(Bindings bindings){
+    //get left-hand side into $2 and right-hand side into $3
+    load(bindings);
+
+    //output calculation assembly
+    output << "xor $2,$2,$3" << std::endl;
+
+    //store result on stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
 }
 
 
@@ -289,8 +422,17 @@ void AndExpression::print(){
     std::cout << std::endl;
 }
 
-void AndExpression::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings AndExpression::printASM(Bindings bindings){
+    //get left-hand side into $2 and right-hand side into $3
+    load(bindings);
+
+    //output calculation assembly
+    output << "and $2,$2,$3" << std::endl;
+
+    //store result on stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
 }
 
 
@@ -309,8 +451,15 @@ void UnaryOpExpression::print(){
     std::cout << std::endl;
 }
 
-void UnaryOpExpression::printASM(/*Bindings *bindings*/){
+Bindings UnaryOpExpression::printASM(Bindings bindings){
     //TODO
+    return bindings;
+}
+
+void UnaryOpExpression::countTemps(int &count){
+    int tmp = 0;
+    unaryExpression_->countTemps(tmp);
+    count = tmp+1;
 }
 
 
@@ -328,8 +477,15 @@ void PostfixExpression::print(){
     std::cout << op_ << std::endl;
 }
 
-void PostfixExpression::printASM(/*Bindings *bindings*/){
+Bindings PostfixExpression::printASM(Bindings bindings){
     //TODO
+    return bindings;
+}
+
+void PostfixExpression::countTemps(int &count){
+    int tmp = 0;
+    postfixExpression_->countTemps(tmp);
+    count = tmp+1;
 }
 
 
@@ -346,8 +502,24 @@ void Identifier::print(){
     std::cout << id_ << std::endl;
 }
 
-void Identifier::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings Identifier::printASM(Bindings bindings){
+    //load into $2
+    int stackPos = bindings.getStackPos(id_);
+    output << "lw $2," << stackPos << "($fp)" << std::endl;
+    output << "nop" << std::endl;
+
+    //store on the stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
+}
+
+void Identifier::countTemps(int &count){
+    count = 1;
+}
+
+std::string Identifier::getId(){
+    return id_;
 }
 
 
@@ -364,12 +536,24 @@ void Constant::print(){
     std::cout << " " << value_ << std::endl;
 }
 
-void Constant::printASM(/*Bindings *bindings*/){
-    //TODO
+Bindings Constant::printASM(Bindings bindings){
+    //load into $2
+    output << "li $2," << value_ << std::endl;
+    output << "nop" << std::endl;
+
+    //store on the stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
+}
+
+void Constant::countTemps(int &count){
+    count = 1;
 }
 
 
 // *********** INITIALIZER CLASS ************ //
+//possibly useless (as in not assessed)//
 
 Initializer::Initializer(ExpressionPtr initializer) : nextInitializer_(initializer) {
 }
@@ -381,10 +565,15 @@ void Initializer::print(){
     std::cout << "Initializer" << std::endl;
 }
 
-void Initializer::printASM(/*Bindings *bindings*/){
+Bindings Initializer::printASM(Bindings bindings){
     //TODO
+    return bindings;
 }
 
 ExpressionPtr Initializer::getNext(){
     return nextInitializer_;
+}
+
+void Initializer::countTemps(int &count){
+    count = 1; //not entirely sure what to do here
 }

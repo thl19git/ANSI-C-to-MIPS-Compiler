@@ -82,7 +82,7 @@ BlockItemList:          // e.g. int x = 3; while(...){...}
 
 BlockItem:              // e.g. int x = 3 || while(...){...}
                         Declaration {$$ = $1;}
-                        | Statement {$$ = $1;}
+                        | Statement {$$ = $1;} 
                         ;
 
 //THE FOLLOWING IS CURRENTLY USELESS, BUT KEPT FOR LATER
