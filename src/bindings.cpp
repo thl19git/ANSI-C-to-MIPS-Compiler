@@ -45,3 +45,11 @@ int Bindings::getTempPos(){
 void Bindings::setTempPos(int n){
     tempStackPos_ = n;
 }
+
+void Bindings::setFunctionEndLabel(int n){
+    functionEndLabel_ = n;
+}
+
+int Bindings::getFunctionEndLabel(){
+    return functionEndLabel_;
+}

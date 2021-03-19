@@ -15,6 +15,7 @@ private:
 
     int stackPos_;
     int tempStackPos_;
+    int functionEndLabel_;
 
 public:
     Bindings();
@@ -30,6 +31,9 @@ public:
     void nextTempPos();
     void setTempPos(int n);
     int getTempPos();
+
+    void setFunctionEndLabel(int n);
+    int getFunctionEndLabel();
 
 };
 
