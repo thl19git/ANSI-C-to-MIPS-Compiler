@@ -20,7 +20,7 @@ private:
 public:
     Bindings();
 
-    void insertBindings(std::string id, std::string type);
+    void insertBindings(std::string id, std::string type, int stackPosition = -1);
 
     int getStackPos();
     int getStackPos(std::string id);

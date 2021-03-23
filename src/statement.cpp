@@ -2,6 +2,7 @@
 
 // *********** BASIC STATEMENT CLASS ************ //
 
+Statement::Statement(){};
 
 // ************ COMPOUND STATEMENT CLASS ************ //
 
