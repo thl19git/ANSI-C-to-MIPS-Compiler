@@ -25,4 +25,5 @@ clean :
 	rm -f src/parser.tab.hpp
 	rm -f src/parser.tab.cpp
 	rm -f src/parser.output
+	rm -rf test_output
 
