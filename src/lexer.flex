@@ -43,6 +43,9 @@ while          { /*fprintf(stderr, "while keyword : %s\n", yytext);*/  return T_
 return          { /*fprintf(stderr, "return keyword : %s\n", yytext);*/  return T_RETURN; }
 for 			{ /*fprintf(stderr, "for keyword : %s\n", yytext);*/  return T_FOR; }
 do				{ /*fprintf(stderr, "do keyword : %s\n", yytext);*/  return T_DO; }
+break			{ /*fprintf(stderr, "break keyword : %s\n", yytext);*/  return T_BREAK; }
+continue		{ /*fprintf(stderr, "continue keyword : %s\n", yytext);*/  return T_CONTINUE; }
+
 
 "+"		{return 	T_PLUS                  	;}
 "+="	{return 	T_ADD_ASSIGN            	;}

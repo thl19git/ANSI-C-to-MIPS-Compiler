@@ -203,6 +203,8 @@ Bindings WhileLoop::printASM(Bindings bindings){
     }
 
     int whileLabel = labelCount++;
+    bindings.setContinueLabel("$"+std::to_string(whileLabel)+"whilecond");
+    bindings.setBreakLabel("$"+std::to_string(whileLabel)+"whilebreak");
 
     //output assembly
 
@@ -219,6 +221,7 @@ Bindings WhileLoop::printASM(Bindings bindings){
 
     output << "bne $2,$0,$" << whileLabel << "whilebody" << std::endl;
     output << "nop" << std::endl;
+    output << "$" << whileLabel << "whilebreak:" << std::endl;
 
     return bindings;
 }
@@ -267,6 +270,8 @@ Bindings DeclarationForLoop::printASM(Bindings bindings){
     Bindings initialBindings = bindings;
 
     int forLabel = labelCount++;
+    bindings.setContinueLabel("$"+std::to_string(forLabel)+"forcond");
+    bindings.setBreakLabel("$"+std::to_string(forLabel)+"forbreak");
 
     bindings = initializer_->printASM(bindings);
     output << "b $" << forLabel << "forcond" << std::endl;
@@ -278,6 +283,7 @@ Bindings DeclarationForLoop::printASM(Bindings bindings){
     condition_->printASM(bindings);
     output << "bne $2,$0,$" << forLabel << "forbody" << std::endl;
     output << "nop" << std::endl;
+    output << "$" << forLabel << "forbreak:" << std::endl;
 
     return initialBindings;
 }
@@ -334,6 +340,8 @@ Bindings ExpressionForLoop::printASM(Bindings bindings){
     Bindings initialBindings = bindings;
 
     int forLabel = labelCount++;
+    bindings.setContinueLabel("$"+std::to_string(forLabel)+"forcond");
+    bindings.setBreakLabel("$"+std::to_string(forLabel)+"forbreak");
 
     initializer_->printASM(bindings);
     output << "b $" << forLabel << "forcond" << std::endl;
@@ -345,6 +353,7 @@ Bindings ExpressionForLoop::printASM(Bindings bindings){
     condition_->printASM(bindings);
     output << "bne $2,$0,$" << forLabel << "forbody" << std::endl;
     output << "nop" << std::endl;
+    output << "$" << forLabel << "forbreak:" << std::endl;
 
     return initialBindings;
 }
@@ -385,7 +394,7 @@ int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0, tmpInitializer = 0, tm
 // *********** RETURN STATEMENT CLASS ************ //
 
 ReturnStatement::ReturnStatement(ExpressionPtr expression) : expression_(expression){
-    //TODO
+
 }
 
 void ReturnStatement::print(){
@@ -427,4 +436,69 @@ void ReturnStatement::countTemps(int &count){
     }
 
     count = std::max(tmpNextBlock,tmpExpression);
+}
+
+
+// *********** BREAK STATEMENT CLASS ************ //
+
+BreakStatement::BreakStatement(){}
+
+void BreakStatement::print(){
+    std::cout << "break" << std::endl;
+}
+
+Bindings BreakStatement::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+
+    output << "b " << bindings.getBreakLabel() << std::endl;
+    output << "nop" << std::endl;
+
+    return bindings;
+
+}
+
+void BreakStatement::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }    
+}
+
+void BreakStatement::countTemps(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(count);
+    }
+}
+
+
+// *********** CONTINUE STATEMENT CLASS ************ //
+
+ContinueStatement::ContinueStatement(){}
+
+void ContinueStatement::print(){
+    std::cout << "continue" << std::endl;
+}
+
+Bindings ContinueStatement::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+
+    output << "b " << bindings.getContinueLabel() << std::endl;
+    output << "nop" << std::endl;
+
+    return bindings;
+}
+
+void ContinueStatement::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }    
+}
+
+void ContinueStatement::countTemps(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(count);
+    }
 }

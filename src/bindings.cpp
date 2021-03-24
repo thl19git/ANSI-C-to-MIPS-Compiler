@@ -59,3 +59,20 @@ void Bindings::setFunctionEndLabel(int n){
 int Bindings::getFunctionEndLabel(){
     return functionEndLabel_;
 }
+
+void Bindings::setBreakLabel(std::string label){
+    breakLabel_ = label;
+}
+
+void Bindings::setContinueLabel(std::string label){
+    continueLabel_ = label;
+}
+
+
+std::string Bindings::getBreakLabel(){
+    return breakLabel_;
+}
+
+std::string Bindings::getContinueLabel(){
+    return continueLabel_;
+}

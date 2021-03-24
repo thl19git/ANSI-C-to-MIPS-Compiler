@@ -27,7 +27,7 @@
 
 %token T_IDENTIFIER T_INT_CONST
 %token T_INT
-%token T_IF T_ELSE T_WHILE T_RETURN T_FOR T_DO
+%token T_IF T_ELSE T_WHILE T_RETURN T_FOR T_DO T_BREAK T_CONTINUE
 %token T_PLUS T_ADD_ASSIGN T_MINUS T_SUB_ASSIGN T_MULT T_MULT_ASSIGN T_DIV T_DIV_ASSIGN 
 %token T_MOD T_MOD_ASSIGN T_AND T_AND_ASSIGN T_OR T_OR_ASSIGN T_XOR T_XOR_ASSIGN T_EQUAL
 %token T_RSHIFT_OP T_RSHIFT_ASSIGN T_LSHIFT_OP T_LSHIFT_ASSIGN T_INC_OP T_DEC_OP T_AND_OP T_OR_OP T_LTE_OP T_GTE_OP
@@ -182,6 +182,8 @@ IterationStatment:      // e.g. while (x > 3) {...}
 JumpStatement:          // e.g. return; || return x == y;
                         T_RETURN T_SEMICOLON {$$ = new ReturnStatement;/* std::cerr << "return" << std::endl;*/}
                         | T_RETURN Expression T_SEMICOLON {$$ = new ReturnStatement($2);/* std::cerr << "return expression" << std::endl;*/}
+                        | T_CONTINUE T_SEMICOLON {$$ = new ContinueStatement();}
+                        | T_BREAK T_SEMICOLON {$$ = new BreakStatement();}
                         ;
 
 Expression:             // e.g. a = 5 || a,b,c || x

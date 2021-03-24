@@ -167,4 +167,31 @@ public:
     virtual void countTemps(int &count);
 };
 
+
+// *********** BREAK STATEMENT CLASS ************ //
+
+class BreakStatement : public JumpStatement{
+protected:
+
+public:
+    BreakStatement();
+    virtual void print();
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
+};
+
+
+// *********** CONTINUE STATEMENT CLASS ************ //
+
+class ContinueStatement : public JumpStatement{
+protected:
+
+public:
+    ContinueStatement();
+    virtual void print();
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
+};
 #endif

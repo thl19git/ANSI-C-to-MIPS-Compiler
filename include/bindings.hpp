@@ -17,6 +17,9 @@ private:
     int tempStackPos_;
     int functionEndLabel_;
 
+    std::string breakLabel_;
+    std::string continueLabel_;
+
 public:
     Bindings();
 
@@ -34,6 +37,12 @@ public:
 
     void setFunctionEndLabel(int n);
     int getFunctionEndLabel();
+
+    void setBreakLabel(std::string label);
+    void setContinueLabel(std::string label);
+
+    std::string getBreakLabel();
+    std::string getContinueLabel();
 
 };
 
