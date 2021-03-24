@@ -1,5 +1,6 @@
 int f(){
-    int x, y;
+    int x;
+    int y;
     x = 3;
     y = 4;
     return x+y+1;
