@@ -1,5 +1,11 @@
 TESTCASE=$1
 
+mkdir -p custom_test_output
+mkdir -p custom_test_output/source
+mkdir -p custom_test_output/object
+mkdir -p custom_test_output/exe
+
+
 set +e
 
 bin/c_compiler -S simple_tests/$TESTCASE".c" -o custom_test_output/source/$TESTCASE.s
