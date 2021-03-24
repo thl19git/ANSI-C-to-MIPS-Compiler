@@ -8,9 +8,22 @@
 /* Bring in our declarations for token types and
    the yylval variable. */
 #include <stdlib.h>
+#include <math.h>
 #include "parser.tab.hpp"
 #include <string>
 std::string* wordT = new std::string;
+int base_to_dec(char* num, int base){
+	int length=0;
+	int result=0;
+	while(num[length]!='\0'){
+		length++;
+	}
+	for(int i=0;i<length;i++){
+	result += (int)((num[i]-'0')) * (pow(base,length-i-1));
+	}
+  return result;
+}
+
 
 // This is to work around an irritating bug in Flex
 // https://stackoverflow.com/questions/46213840/get-rid-of-warning-implicit-declaration-of-function-fileno-in-flex
@@ -77,8 +90,10 @@ return          { /*fprintf(stderr, "return keyword : %s\n", yytext);*/  return 
 
 
 [_a-zA-Z][_a-zA-Z0-9]*          { yylval.string=new std::string(yytext);  return T_IDENTIFIER; }
-[0-9]+							{ yylval.number=strtod(yytext,0);  return T_INT_CONST; }
-
+[1-9]+[0-9]*				{ yylval.number=strtod(yytext,0);  return T_INT_CONST; }
+0[0-7]*						{ yylval.number= base_to_dec(yytext,8); return T_INT_CONST;}
+0b[0-1]+					{ yylval.number=base_to_dec(yytext+2,2); return T_INT_CONST;}
+0x[0-9a-fA-F]+					{ yylval.number=strtod(yytext,0);return T_INT_CONST;}
 \n              { /*fprintf(stderr, "Newline\n");*/ }
 .				{ /*fprintf(stderr, "Unsupported character\n");*/}
 %%
