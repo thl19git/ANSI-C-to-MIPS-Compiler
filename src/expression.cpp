@@ -452,7 +452,13 @@ void UnaryOpExpression::print(){
 }
 
 Bindings UnaryOpExpression::printASM(Bindings bindings){
-    //TODO
+    unaryExpression_->printASM(bindings);
+    if(op_ == "++"){
+        output<<"addi $2,$2,1"<<std::endl;
+        output<<"sw $2,"<< bindings.getStackPos(unaryExpression_->getId())<< "($fp)" <<std::endl;
+    }
+    //store result on the stack
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
     return bindings;
 }
 

@@ -1,6 +1,6 @@
 int f(){
     int x;
-    x = 1;
-    x += 2;
+    x = 0xa;
+    x = ++x + 1 * 3;
     return x;
 }

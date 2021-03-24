@@ -182,7 +182,7 @@ IterationStatement::IterationStatement(ExpressionPtr condition, StatementPtr sta
 
 // *********** WHILE LOOP CLASS ************ //
 
-WhileLoop::WhileLoop(ExpressionPtr condition, StatementPtr statement) : IterationStatement(condition, statement) {
+WhileLoop::WhileLoop(ExpressionPtr condition, StatementPtr statement, bool isDo) : IterationStatement(condition, statement), isDo_(isDo) {
 
 }
 
@@ -206,9 +206,11 @@ Bindings WhileLoop::printASM(Bindings bindings){
 
     //output assembly
 
-    output << "b $" << whileLabel << "whilecond" << std:: endl;
-    output << "nop" << std::endl;
-
+    if(!isDo_){
+        output << "b $" << whileLabel << "whilecond" << std:: endl;
+        output << "nop" << std::endl;
+    }
+    
     output << "$" << whileLabel << "whilebody:" << std::endl; 
     statement_->printASM(bindings);
 
@@ -244,6 +246,137 @@ void WhileLoop::countTemps(int &count){
 
     count = std::max(tmpNextBlock,std::max(tmpCondition, tmpStatement));
 
+}
+
+
+// ***********DECLARATION FOR LOOP CLASS ************ //
+
+DeclarationForLoop::DeclarationForLoop(DeclarationPtr initializer, ExpressionPtr condition, ExpressionPtr incrementer, StatementPtr statement) : IterationStatement(condition, statement), initializer_(initializer), incrementer_(incrementer) {
+
+}
+
+void DeclarationForLoop::print(){
+    std::cout << "for loop" << std::endl;
+}
+
+Bindings DeclarationForLoop::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+
+    Bindings initialBindings = bindings;
+
+    int forLabel = labelCount++;
+
+    bindings = initializer_->printASM(bindings);
+    output << "b $" << forLabel << "forcond" << std::endl;
+    output << "nop" << std::endl;
+    output << "$" << forLabel << "forbody:" << std::endl;
+    statement_->printASM(bindings);
+    incrementer_ ->printASM(bindings);
+    output << "$" << forLabel << "forcond:" << std::endl;
+    condition_->printASM(bindings);
+    output << "bne $2,$0,$" << forLabel << "forbody" << std::endl;
+    output << "nop" << std::endl;
+
+    return initialBindings;
+}
+
+void DeclarationForLoop::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }
+    if(statement_!=nullptr){
+        statement_->countVariables(count);
+    }
+    if(initializer_!=nullptr){
+        count++;
+    }
+}
+
+void DeclarationForLoop::countTemps(int &count){
+int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0, tmpInitializer = 0, tmpIncrementer = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    if(initializer_!=nullptr){
+        initializer_->countTemps(tmpInitializer);
+    }
+    if(condition_!=nullptr){
+        condition_->countTemps(tmpCondition);
+    }
+    if(incrementer_!=nullptr){
+        incrementer_->countTemps(tmpIncrementer);
+    }
+    if(statement_!=nullptr){
+        statement_->countTemps(tmpStatement);
+    }
+
+    count = std::max(tmpNextBlock,std::max(tmpCondition, std::max(tmpStatement, std::max(tmpInitializer, tmpIncrementer))));
+}
+
+
+// ***********EXPRESSION FOR LOOP CLASS ************ //
+
+ExpressionForLoop::ExpressionForLoop(ExpressionPtr initializer, ExpressionPtr condition, ExpressionPtr incrementer, StatementPtr statement) : IterationStatement(condition, statement), initializer_(initializer), incrementer_(incrementer) {
+
+}
+
+void ExpressionForLoop::print(){
+    std::cout << "for loop" << std::endl;
+}
+
+Bindings ExpressionForLoop::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+
+    Bindings initialBindings = bindings;
+
+    int forLabel = labelCount++;
+
+    initializer_->printASM(bindings);
+    output << "b $" << forLabel << "forcond" << std::endl;
+    output << "nop" << std::endl;
+    output << "$" << forLabel << "forbody:" << std::endl;
+    statement_->printASM(bindings);
+    incrementer_ ->printASM(bindings);
+    output << "$" << forLabel << "forcond:" << std::endl;
+    condition_->printASM(bindings);
+    output << "bne $2,$0,$" << forLabel << "forbody" << std::endl;
+    output << "nop" << std::endl;
+
+    return initialBindings;
+}
+
+void ExpressionForLoop::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }
+    if(statement_!=nullptr){
+        statement_->countVariables(count);
+    }
+}
+
+void ExpressionForLoop::countTemps(int &count){
+int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0, tmpInitializer = 0, tmpIncrementer = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    if(initializer_!=nullptr){
+        initializer_->countTemps(tmpInitializer);
+    }
+    if(condition_!=nullptr){
+        condition_->countTemps(tmpCondition);
+    }
+    if(incrementer_!=nullptr){
+        incrementer_->countTemps(tmpIncrementer);
+    }
+    if(statement_!=nullptr){
+        statement_->countTemps(tmpStatement);
+    }
+
+    count = std::max(tmpNextBlock,std::max(tmpCondition, std::max(tmpStatement, std::max(tmpInitializer, tmpIncrementer))));
 }
 
 // *********** JUMP STATEMENT CLASS ************ //

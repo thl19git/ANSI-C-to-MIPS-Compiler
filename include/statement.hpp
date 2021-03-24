@@ -96,14 +96,47 @@ public:
 
 class WhileLoop : public IterationStatement{
 protected:
-
+    bool isDo_;
 public:
-    WhileLoop(ExpressionPtr condition, StatementPtr statement);
+    WhileLoop(ExpressionPtr condition, StatementPtr statement, bool isDo = false);
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
 };
+
+
+// *********** DECLARATION FOR LOOP CLASS ************ //
+
+class DeclarationForLoop : public IterationStatement{
+protected:
+    DeclarationPtr initializer_;
+    ExpressionPtr incrementer_;
+
+public:
+    DeclarationForLoop(DeclarationPtr initializer, ExpressionPtr condition, ExpressionPtr incrementer, StatementPtr statement);
+    virtual void print();
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
+};
+
+
+// *********** EXPRESSION FOR LOOP CLASS ************ //
+
+class ExpressionForLoop : public IterationStatement{
+protected:
+    ExpressionPtr initializer_;
+    ExpressionPtr incrementer_;
+
+public:
+    ExpressionForLoop(ExpressionPtr initializer, ExpressionPtr condition, ExpressionPtr incrementer, StatementPtr statement);
+    virtual void print();
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countVariables(int &count);
+    virtual void countTemps(int &count);
+};
+
 
 
 // *********** JUMP STATEMENT CLASS ************ //

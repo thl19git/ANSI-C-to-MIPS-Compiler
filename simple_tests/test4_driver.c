@@ -1,5 +1,5 @@
 int f();
 
 int main(){
-    return !(f()==3);
+    return !(f()==14);
 }

@@ -41,6 +41,8 @@ if          { /*fprintf(stderr, "if keyword : %s\n", yytext);*/  return T_IF; }
 else          { /*fprintf(stderr, "else keyword : %s\n", yytext);*/  return T_ELSE; }
 while          { /*fprintf(stderr, "while keyword : %s\n", yytext);*/  return T_WHILE; }
 return          { /*fprintf(stderr, "return keyword : %s\n", yytext);*/  return T_RETURN; }
+for 			{ /*fprintf(stderr, "for keyword : %s\n", yytext);*/  return T_FOR; }
+do				{ /*fprintf(stderr, "do keyword : %s\n", yytext);*/  return T_DO; }
 
 "+"		{return 	T_PLUS                  	;}
 "+="	{return 	T_ADD_ASSIGN            	;}

@@ -27,7 +27,7 @@
 
 %token T_IDENTIFIER T_INT_CONST
 %token T_INT
-%token T_IF T_ELSE T_WHILE T_RETURN
+%token T_IF T_ELSE T_WHILE T_RETURN T_FOR T_DO
 %token T_PLUS T_ADD_ASSIGN T_MINUS T_SUB_ASSIGN T_MULT T_MULT_ASSIGN T_DIV T_DIV_ASSIGN 
 %token T_MOD T_MOD_ASSIGN T_AND T_AND_ASSIGN T_OR T_OR_ASSIGN T_XOR T_XOR_ASSIGN T_EQUAL
 %token T_RSHIFT_OP T_RSHIFT_ASSIGN T_LSHIFT_OP T_LSHIFT_ASSIGN T_INC_OP T_DEC_OP T_AND_OP T_OR_OP T_LTE_OP T_GTE_OP
@@ -174,6 +174,9 @@ SelectionStatement:     // e.g. if(a){...} || if(x+3) {...} else {...}
 
 IterationStatment:      // e.g. while (x > 3) {...}
                         T_WHILE T_LB Expression T_RB Statement {$$ = new WhileLoop($3,$5);/* std::cerr << "while loop" << std::endl;*/}
+                        | T_DO Statement T_WHILE T_LB Expression T_RB T_SEMICOLON {$$ = new WhileLoop($5,$2,true);}
+                        | T_FOR T_LB Declaration Expression T_SEMICOLON Expression T_RB Statement {$$ = new DeclarationForLoop($3,$4,$6,$8);}
+                        | T_FOR T_LB Expression T_SEMICOLON Expression T_SEMICOLON Expression T_RB Statement {$$ = new ExpressionForLoop($3,$5,$7,$9);}
                         ;
 
 JumpStatement:          // e.g. return; || return x == y;
