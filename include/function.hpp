@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include "bindings.hpp"
+#include "parameter.hpp"
 
 class Function;
 typedef Node* NodePtr;
@@ -15,12 +16,11 @@ class Function : public Node{
 protected:
     std::string name_;
     std::string type_;
-    //some bindings??
     StatementPtr statement_;
-    //some parameters
+    ParameterPtr parameter_;
 
 public:
-    Function(std::string type, std::string name, StatementPtr statement);
+    Function(std::string type, std::string name, StatementPtr statement, ParameterPtr parameter = nullptr);
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
 };

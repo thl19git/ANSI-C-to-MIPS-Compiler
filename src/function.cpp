@@ -1,6 +1,6 @@
 #include "../include/function.hpp"
 
-Function::Function(std::string type, std::string name, StatementPtr statement) : name_(name), type_(type), statement_(statement){
+Function::Function(std::string type, std::string name, StatementPtr statement, ParameterPtr parameter) : name_(name), type_(type), statement_(statement), parameter_(parameter) {
 
 }
 
@@ -56,6 +56,12 @@ Bindings Function::printASM(Bindings bindings){
 
     //set stack pointer in bindings for temporaries
     bindings.setTempPos(variables*4);
+
+    //print assembly of the parameters
+    if(parameter_!=nullptr){
+        int num = parameter_->countParameters();
+        bindings = parameter_->printParameterASM(bindings, stackSize+(num-1)*4, num);
+    }
 
     //print assembly of the function statement
     statement_->printASM(bindings);

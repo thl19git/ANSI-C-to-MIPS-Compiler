@@ -289,7 +289,7 @@ Bindings EqualityExpression::printASM(Bindings bindings){
     //output calculation assembly
     output << "xor $2,$2,$3" << std::endl;
     if(op_ == "=="){
-        output << "slti $2,$2,1" << std::endl;
+        output << "sltiu $2,$2,1" << std::endl;
     } else if (op_ == "!="){
         output << "sltu $2,$0,$2" << std::endl;
     }

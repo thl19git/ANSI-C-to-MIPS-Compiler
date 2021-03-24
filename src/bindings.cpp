@@ -4,8 +4,14 @@ Bindings::Bindings() : stackPos_(0), tempStackPos_(0) {
 
 }
 
-void Bindings::insertBindings(std::string id, std::string type){
-    int pos = getStackPos();
+void Bindings::insertBindings(std::string id, std::string type, int stackPosition){
+    int pos;
+    if(stackPosition==-1){
+        pos = getStackPos();
+    } else {
+        pos = stackPosition;
+    }
+
     VariableData tmp = {type, pos};
     bindings_[id] = tmp;
 }
@@ -44,4 +50,12 @@ int Bindings::getTempPos(){
 
 void Bindings::setTempPos(int n){
     tempStackPos_ = n;
+}
+
+void Bindings::setFunctionEndLabel(int n){
+    functionEndLabel_ = n;
+}
+
+int Bindings::getFunctionEndLabel(){
+    return functionEndLabel_;
 }

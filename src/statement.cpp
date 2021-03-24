@@ -2,13 +2,7 @@
 
 // *********** BASIC STATEMENT CLASS ************ //
 
-Statement::Statement(){
-}
-
-Bindings Statement::printASM(Bindings bindings){
-    //TODO
-}
-
+Statement::Statement(){};
 
 // ************ COMPOUND STATEMENT CLASS ************ //
 

@@ -15,11 +15,12 @@ private:
 
     int stackPos_;
     int tempStackPos_;
+    int functionEndLabel_;
 
 public:
     Bindings();
 
-    void insertBindings(std::string id, std::string type);
+    void insertBindings(std::string id, std::string type, int stackPosition = -1);
 
     int getStackPos();
     int getStackPos(std::string id);
@@ -30,6 +31,9 @@ public:
     void nextTempPos();
     void setTempPos(int n);
     int getTempPos();
+
+    void setFunctionEndLabel(int n);
+    int getFunctionEndLabel();
 
 };
 

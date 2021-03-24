@@ -20,6 +20,7 @@
   Expression* expression;
   Declaration* declaration;
   BlockItem* block;
+  Parameter* parameter;
 }
 
 %define parse.error verbose
@@ -45,6 +46,8 @@
 
 %type <function> FunctionDefinition
 
+%type <parameter> Parameter ParameterList BracketedParameterList
+
 %type <block> BlockItem BlockItemList
 
 %type <statement> Statement IterationStatment JumpStatement ExpressionStatement SelectionStatement CompoundStatement
@@ -68,7 +71,11 @@ TranslationUnit:        // e.g. int foo() {...}
                         ;
                 
 FunctionDefinition:     // e.g. int foo() {...}
-                        TypeSpecifier Declarator CompoundStatement {$$ = new Function(*$1,$2->getId(),$3);/* std::cerr << "function definition = type name compoundstatement" << std::endl;*/}
+                        TypeSpecifier Declarator BracketedParameterList CompoundStatement { if($4!=nullptr){
+                                                                                              $$ = new Function(*$1,$2->getId(),$4,$3);
+                                                                                            } else {
+                                                                                              $$ = new Function(*$1,$2->getId(),NULL,$3);
+                                                                                            }}
                         ;
                         
 CompoundStatement:      // e.g. {int x = 5; return x + 3;}
@@ -83,6 +90,20 @@ BlockItemList:          // e.g. int x = 3; while(...){...}
 BlockItem:              // e.g. int x = 3 || while(...){...}
                         Declaration {$$ = $1;}
                         | Statement {$$ = $1;} 
+                        ;
+
+BracketedParameterList: //e.g. (int x, int y)
+                        T_LB ParameterList T_RB {$$ = $2;}
+                        | T_LB T_RB {$$ = nullptr;}
+                        ;
+
+ParameterList:          //e.g. int x, int y
+                        Parameter {$$ = $1;}
+                        | ParameterList T_COMMA Parameter {$3->linkParameter($$); $$ = $3;}
+                        ;
+
+Parameter:              //e.g. int x
+                        TypeSpecifier Declarator {$$ = new Parameter(*$1,$2->getId());}
                         ;
 
 //THE FOLLOWING IS CURRENTLY USELESS, BUT KEPT FOR LATER
@@ -102,7 +123,7 @@ Declaration:            // e.g int x; || int x = 5;
                         ;
 
 
-InitDeclaratorList:     // e.g. x; || x , y || int a = 1, b = 2
+InitDeclaratorList:     // e.g. x || x , y || a = 1, b = 2
                         InitDeclarator {$$ = $1;/* std::cerr << "init declarator list = init declarator" << std::endl;*/}
                         | InitDeclaratorList T_COMMA InitDeclarator {$3->linkDeclaration($$); $$ = $3;/* std::cerr << "adding init declarator to list" << std::endl;*/}
                         ;
@@ -119,7 +140,7 @@ Declarator:             // e.g. a || sum
 DirectDeclarator:       // e.g. a || sum
                         T_IDENTIFIER {$$ = new IdentifierDeclaration(*$1,NULL);/* std::cerr << "direct declarator = identifer "<< *$1 << std::endl;*/} //some uninitialized value is created here
                         | T_LB Declarator T_RB {$$ = $2;/* std::cerr << "direct declarator = (declarator)" << std::endl;*/}
-                        | DirectDeclarator T_LB T_RB {$$ = $1;/*  std::cerr << "direct declarator = direct declarator ()" << std::endl;*/}
+                        //| DirectDeclarator T_LB T_RB {$$ = $1;/*  std::cerr << "direct declarator = direct declarator ()" << std::endl;*/}
                         ;
  
 Initializer:            // e.g. a || b = 2

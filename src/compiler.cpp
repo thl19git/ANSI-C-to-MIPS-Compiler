@@ -11,7 +11,7 @@ int labelCount = 0;
 
 int main(int argc, char* argv[]){
 
-    std::cout << "Grabbing input file" << std::endl;
+    //std::cout << "Grabbing input file" << std::endl;
 
     FILE* sourceFile;
 
@@ -29,11 +29,11 @@ int main(int argc, char* argv[]){
 
     yyset_in(sourceFile);
 
-    std::cout << "Lexing & parsing input, building AST" << std::endl;
+    //std::cout << "Lexing & parsing input, building AST" << std::endl;
 
     Node* ast = parseAST();
 
-    std::cout << "Printing Assembly" << std::endl;
+    //std::cout << "Printing Assembly" << std::endl;
 
     //ast->print();
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]){
         std::cerr << "Exception: " << e.what() << std::endl;
     }
 
-    std::cout << "Printed assembly, ending program" << std::endl;
+    //std::cout << "Printed assembly, ending program" << std::endl;
 
     output.close();
 }

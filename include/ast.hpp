@@ -10,5 +10,6 @@
 #include "expression.hpp"
 #include "block_item.hpp"
 #include "bindings.hpp"
+#include "parameter.hpp"
 
 #endif
