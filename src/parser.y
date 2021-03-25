@@ -45,7 +45,7 @@
 
 %type <transunit> TranslationUnit
 
-%type <function> FunctionDefinition
+%type <function> FunctionDefinition FunctionDeclaration
 
 %type <parameter> Parameter ParameterList BracketedParameterList
 
@@ -69,9 +69,13 @@ ROOT:                   TranslationUnit {g_root = $1;/* std::cerr << "root = tra
                         ;
 
 TranslationUnit:        // e.g. int foo() {...}
-                        FunctionDefinition {$$ = new TranslationUnit($1);/* std::cerr << "translationunit = function definition" << std::endl;*/}
-                        | TranslationUnit FunctionDefinition {$$->append($2);/*  std::cerr << "adding function definition to translationunit" << std::endl;*/}
+                        FunctionDeclaration {$$ = new TranslationUnit($1);/* std::cerr << "translationunit = function definition" << std::endl;*/}
+                        | TranslationUnit FunctionDeclaration {$$->append($2);/*  std::cerr << "adding function definition to translationunit" << std::endl;*/}
                         ;
+
+FunctionDeclaration:    // e.g. int foo(){...} || int foo();
+                        FunctionDefinition {$$ = $1;}
+                        | TypeSpecifier Declarator BracketedParameterList T_SEMICOLON {$$ = nullptr;}
                 
 FunctionDefinition:     // e.g. int foo() {...}
                         TypeSpecifier Declarator BracketedParameterList CompoundStatement { if($4!=nullptr){

@@ -652,8 +652,10 @@ Bindings FunctionCall::printASM(Bindings bindings){
 
 void FunctionCall::countTemps(int &count){
     int tmpcount = 0;
-    parameters_->countTemps(tmpcount);
-    count = tmpcount;
+    if(parameters_!=nullptr){
+        parameters_->countTemps(tmpcount);
+    }
+    count = tmpcount + 1;
 }
 
 void FunctionCall::countArgs(int &count){
