@@ -29,41 +29,41 @@ The test inputs will be a set of files of increasing complexity and variety. The
 
 Here is a list of basic features that you might like to implement first.
 
-1. a file containing just a single function with no arguments
-2. variables of `int` type
-3. local variables
-4. arithmetic and logical expressions
-5. if-then-else statements
-6. while loops
+1. a file containing just a single function with no arguments - done
+2. variables of `int` type - done
+3. local variables - done
+4. arithmetic and logical expressions - nearly finished
+5. if-then-else statements - done
+6. while loops - done
 
 Here is a list of intermediate features that you might like to implement once the basic features are working.
 
-7. files containing multiple functions that call each other
-8. functions that take up to four parameters
-9. for loops
-10. arrays declared globally (i.e. outside of any function in your file)
-11. arrays declared locally (i.e. inside a function)
-12. reading and writing elements of an array
-13. recursive function calls
-14. the `enum` keyword
-15. `switch` statements
-16. the `break` and `continue` keywords
+7. files containing multiple functions that call each other - done
+8. functions that take up to four parameters - done
+9. for loops - done
+10. arrays declared globally (i.e. outside of any function in your file) - maybe try this if we have time?
+11. arrays declared locally (i.e. inside a function) - TODO
+12. reading and writing elements of an array - TODO
+13. recursive function calls - probably supported (untested)
+14. the `enum` keyword - TODO
+15. `switch` statements - TODO
+16. the `break` and `continue` keywords - done
 
 Here is a list of more advanced features like you might like to implement once the basic and intermediate features are working.
 
-17. variables of `double`, `float`, `char`, `unsigned`, structs, and pointer types
-18. calling externally-defined functions (i.e. the file being compiled declares a function, but its definition is provided in a different file that is linked in later on)
-19. functions that take more than four parameters
-20. mutually recursive function calls
-21. locally scoped variable declarations (e.g. a variable that is declared inside the body of a while loop, such as `while(...) { int x = ...; ... }`.
-22. the `typedef` keyword
-23. the `sizeof(...)` function (which takes either a type or a variable)
-24. taking the address of a variable using the `&` operator
-25. dereferencing a pointer-variable using the `*` operator
-26. pointer arithmetic
-27. character literals, including escape sequences like `\n`
-28. strings (as NULL-terminated character arrays)
-29. declaration and use of structs
+17. variables of `double`, `float`, `char`, `unsigned`, structs, and pointer types - probably avoid
+18. calling externally-defined functions (i.e. the file being compiled declares a function, but its definition is provided in a different file that is linked in later on) - done
+19. functions that take more than four parameters - done
+20. mutually recursive function calls - probably supported (untested)
+21. locally scoped variable declarations (e.g. a variable that is declared inside the body of a while loop, such as `while(...) { int x = ...; ... }`. - done except repeated names both in scope
+22. the `typedef` keyword - maybe do?
+23. the `sizeof(...)` function (which takes either a type or a variable) - maybe do?
+24. taking the address of a variable using the `&` operator - probably not
+25. dereferencing a pointer-variable using the `*` operator - probably not
+26. pointer arithmetic - probably not
+27. character literals, including escape sequences like `\n` - probably not
+28. strings (as NULL-terminated character arrays) - probably not
+29. declaration and use of structs - probably not
 
 Your compiler will be assessed using test inputs that exercise the above features. No feature not listed above will be tested. 
 Here is a (partial) list of features that will not be tested.
