@@ -270,7 +270,7 @@ Bindings DeclarationForLoop::printASM(Bindings bindings){
     Bindings initialBindings = bindings;
 
     int forLabel = labelCount++;
-    bindings.setContinueLabel("$"+std::to_string(forLabel)+"forcond");
+    bindings.setContinueLabel("$"+std::to_string(forLabel)+"forincrement");
     bindings.setBreakLabel("$"+std::to_string(forLabel)+"forbreak");
 
     bindings = initializer_->printASM(bindings);
@@ -278,6 +278,7 @@ Bindings DeclarationForLoop::printASM(Bindings bindings){
     output << "nop" << std::endl;
     output << "$" << forLabel << "forbody:" << std::endl;
     statement_->printASM(bindings);
+    output << "$" << forLabel << "forincrement:" << std::endl;
     incrementer_ ->printASM(bindings);
     output << "$" << forLabel << "forcond:" << std::endl;
     condition_->printASM(bindings);
@@ -340,7 +341,7 @@ Bindings ExpressionForLoop::printASM(Bindings bindings){
     Bindings initialBindings = bindings;
 
     int forLabel = labelCount++;
-    bindings.setContinueLabel("$"+std::to_string(forLabel)+"forcond");
+    bindings.setContinueLabel("$"+std::to_string(forLabel)+"forincrement");
     bindings.setBreakLabel("$"+std::to_string(forLabel)+"forbreak");
 
     initializer_->printASM(bindings);
@@ -348,6 +349,7 @@ Bindings ExpressionForLoop::printASM(Bindings bindings){
     output << "nop" << std::endl;
     output << "$" << forLabel << "forbody:" << std::endl;
     statement_->printASM(bindings);
+    output << "$" << forLabel << "forincrement:" << std::endl;
     incrementer_ ->printASM(bindings);
     output << "$" << forLabel << "forcond:" << std::endl;
     condition_->printASM(bindings);
