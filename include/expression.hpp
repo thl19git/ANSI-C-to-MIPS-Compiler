@@ -4,8 +4,11 @@
 #include "node.hpp"
 #include <string>
 #include "bindings.hpp"
+#include "inputparameter.hpp"
 
 class Expression;
+class InputParameter;
+typedef InputParameter* InputParameterPtr;
 typedef Expression* ExpressionPtr;
 
 // *********** BASIC EXPRESSION CLASS ************ //
@@ -20,6 +23,7 @@ public:
     ExpressionPtr getNext();
     virtual void countTemps(int &count) = 0;
     virtual std::string getId();
+    virtual void countArgs(int &count) = 0;
 };
 
 
@@ -36,6 +40,7 @@ public:
     virtual Bindings printASM(Bindings bindings) = 0;
     virtual void countTemps(int &count);
     void load(Bindings bindings);
+    virtual void countArgs(int &count);
 };
 
 
@@ -49,6 +54,7 @@ public:
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count) = 0;
+    virtual void countArgs(int &count) = 0;
 };
 
 
@@ -210,6 +216,7 @@ public:
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -225,6 +232,7 @@ public:
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -240,6 +248,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count);
     virtual std::string getId();
+    virtual void countArgs(int &count);
 };
 
 
@@ -254,6 +263,7 @@ public:
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -269,6 +279,22 @@ public:
     virtual Bindings printASM(Bindings bindings);
     ExpressionPtr getNext();
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
+};
+
+// *********** FUNCTION CALL CLASS ************ //
+
+class FunctionCall : public Expression {
+protected:
+    std::string id_;
+    InputParameterPtr parameters_;
+
+public:
+    FunctionCall(std::string id, InputParameterPtr params = nullptr);
+    virtual void print();
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 #endif

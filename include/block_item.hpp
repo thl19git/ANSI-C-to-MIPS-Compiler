@@ -17,6 +17,7 @@ public:
     virtual Bindings printASM(Bindings bindings)=0;
     virtual void countVariables(int &count) = 0;
     virtual void countTemps(int &count) = 0;
+    virtual void countArgs(int &count) = 0; 
     void linkBlock(BlockItemPtr nextBlock);
     BlockItemPtr getNext();
 };

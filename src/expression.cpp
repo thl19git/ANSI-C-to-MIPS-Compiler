@@ -48,6 +48,13 @@ void BinaryExpression::countTemps(int &count){
     count = tmpLeft + tmpRight + 1;
 }
 
+void BinaryExpression::countArgs(int &count){
+    int tmpLeft = 0, tmpRight = 0;
+    left_->countArgs(tmpLeft);
+    right_->countArgs(tmpRight);
+    count = std::max(tmpLeft,tmpRight);
+}
+
 
 // *********** UNARY EXPRESSION CLASS ************ //
 
@@ -468,6 +475,12 @@ void UnaryOpExpression::countTemps(int &count){
     count = tmp+1;
 }
 
+void UnaryOpExpression::countArgs(int &count){
+    int tmp = 0;
+    unaryExpression_->countArgs(tmp);
+    count = tmp;
+}
+
 
 // *********** POSTFIX EXPRESSION CLASS ************ //
 
@@ -492,6 +505,12 @@ void PostfixExpression::countTemps(int &count){
     int tmp = 0;
     postfixExpression_->countTemps(tmp);
     count = tmp+1;
+}
+
+void PostfixExpression::countArgs(int &count){
+    int tmp = 0;
+    postfixExpression_->countArgs(tmp);
+    count = tmp;
 }
 
 
@@ -528,6 +547,10 @@ std::string Identifier::getId(){
     return id_;
 }
 
+void Identifier::countArgs(int &count){
+    count = 0;
+}
+
 
 // *********** CONSTANT CLASS ************ //
 
@@ -557,6 +580,9 @@ void Constant::countTemps(int &count){
     count = 1;
 }
 
+void Constant::countArgs(int &count){
+    count = 0;
+}
 
 // *********** INITIALIZER CLASS ************ //
 //possibly useless (as in not assessed)//
@@ -582,4 +608,58 @@ ExpressionPtr Initializer::getNext(){
 
 void Initializer::countTemps(int &count){
     count = 1; //not entirely sure what to do here
+}
+
+void Initializer::countArgs(int &count){
+    count = 0; //not entirely sure what to do here
+}
+
+
+// *********** FUNCTION CALL CLASS ************ //
+
+FunctionCall::FunctionCall(std::string id, InputParameterPtr params) : id_(id), parameters_(params) {
+
+}
+
+void FunctionCall::print(){
+    std::cout << "function call" << std::endl;
+}
+
+Bindings FunctionCall::printASM(Bindings bindings){
+
+    Bindings initialBindings = bindings;
+
+    //count number of parameters
+    int params = 0;
+    if(parameters_!=nullptr){
+        params = parameters_->countParams();
+    }
+    
+    //print assembly for parameters (put on stack / in registers)
+    if(params>0){
+        parameters_->printParameterASM(bindings, params);
+    }
+    
+    //jump to the function
+    output << "jal " << id_ << std::endl;
+    output << "nop" << std::endl;
+
+    //result should now be in $2, so store on stack in temporary
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return initialBindings;
+}
+
+void FunctionCall::countTemps(int &count){
+    int tmpcount = 0;
+    parameters_->countTemps(tmpcount);
+    count = tmpcount;
+}
+
+void FunctionCall::countArgs(int &count){
+    if(parameters_!=nullptr){
+        count = parameters_->countParams();
+    } else {
+        count = 0;
+    }
 }

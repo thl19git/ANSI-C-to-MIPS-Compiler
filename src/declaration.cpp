@@ -86,3 +86,15 @@ void IdentifierDeclaration::countTemps(int &count){
 
     count = std::max(tmpNextBlock,tmpInit);
 }
+
+void IdentifierDeclaration::countArgs(int &count){
+    int tmpNextBlock = 0, tmpInit = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(tmpNextBlock);
+    }
+    if(initializer_!=nullptr){
+        initializer_->countTemps(tmpInit);
+    }
+
+    count = std::max(tmpNextBlock,tmpInit);
+}

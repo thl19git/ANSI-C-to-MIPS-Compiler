@@ -50,6 +50,17 @@ void CompoundStatement::countTemps(int &count){
     count = std::max(tmpNextBlock,tmpBlockList);
 }
 
+void CompoundStatement::countArgs(int &count){
+    int tmpNextBlock = 0, tmpBlockList = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countArgs(tmpNextBlock);
+    }
+    if(blockList_!=nullptr){
+        blockList_->countArgs(tmpBlockList);
+    }
+    count = std::max(tmpNextBlock,tmpBlockList);
+}
+
 
 // ************ EXPRESSION STATEMENT CLASS ************ //
 
@@ -89,6 +100,14 @@ void ExpressionStatement::countTemps(int &count){
     count = std::max(tmpNextBlock,tmpExpression);
 }
 
+void ExpressionStatement::countArgs(int &count){
+    int tmpNextBlock = 0, tmpExpression = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countArgs(tmpNextBlock);
+    }
+    expression_->countArgs(tmpExpression);
+    count = std::max(tmpNextBlock,tmpExpression);
+}
 
 // *********** IF ELSE STATEMENT CLASS ************ //
 
@@ -166,6 +185,25 @@ void IfElseStatement::countTemps(int &count){
     }
     if(elseStatement_!=nullptr){
         elseStatement_->countTemps(tmpElse);
+    }
+
+    count = std::max(tmpNextBlock,std::max(tmpCondition,std::max(tmpIf,tmpElse)));
+
+}
+
+void IfElseStatement::countArgs(int &count){
+int tmpNextBlock = 0, tmpCondition = 0, tmpIf = 0, tmpElse = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countArgs(tmpNextBlock);
+    }
+    if(condition_!=nullptr){
+        condition_->countArgs(tmpCondition);
+    }
+    if(ifStatement_!=nullptr){
+        ifStatement_->countArgs(tmpIf);
+    }
+    if(elseStatement_!=nullptr){
+        elseStatement_->countArgs(tmpElse);
     }
 
     count = std::max(tmpNextBlock,std::max(tmpCondition,std::max(tmpIf,tmpElse)));
@@ -251,6 +289,22 @@ void WhileLoop::countTemps(int &count){
 
 }
 
+void WhileLoop::countArgs(int &count){
+int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countArgs(tmpNextBlock);
+    }
+    if(condition_!=nullptr){
+        condition_->countArgs(tmpCondition);
+    }
+    if(statement_!=nullptr){
+        statement_->countArgs(tmpStatement);
+    }
+
+    count = std::max(tmpNextBlock,std::max(tmpCondition, tmpStatement));
+
+}
+
 
 // ***********DECLARATION FOR LOOP CLASS ************ //
 
@@ -322,6 +376,28 @@ int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0, tmpInitializer = 0, tm
     count = std::max(tmpNextBlock,std::max(tmpCondition, std::max(tmpStatement, std::max(tmpInitializer, tmpIncrementer))));
 }
 
+void DeclarationForLoop::countArgs(int &count){
+int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0, tmpInitializer = 0, tmpIncrementer = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countArgs(tmpNextBlock);
+    }
+    if(initializer_!=nullptr){
+        initializer_->countArgs(tmpInitializer);
+    }
+    if(condition_!=nullptr){
+        condition_->countArgs(tmpCondition);
+    }
+    if(incrementer_!=nullptr){
+        incrementer_->countArgs(tmpIncrementer);
+    }
+    if(statement_!=nullptr){
+        statement_->countArgs(tmpStatement);
+    }
+
+    count = std::max(tmpNextBlock,std::max(tmpCondition, std::max(tmpStatement, std::max(tmpInitializer, tmpIncrementer))));
+
+}
+
 
 // ***********EXPRESSION FOR LOOP CLASS ************ //
 
@@ -390,6 +466,30 @@ int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0, tmpInitializer = 0, tm
     count = std::max(tmpNextBlock,std::max(tmpCondition, std::max(tmpStatement, std::max(tmpInitializer, tmpIncrementer))));
 }
 
+void ExpressionForLoop::countArgs(int &count){
+    int tmpNextBlock = 0, tmpCondition = 0, tmpStatement = 0, tmpInitializer = 0, tmpIncrementer = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countArgs(tmpNextBlock);
+    }
+    if(initializer_!=nullptr){
+        initializer_->countArgs(tmpInitializer);
+    }
+    if(condition_!=nullptr){
+        condition_->countArgs(tmpCondition);
+    }
+    if(incrementer_!=nullptr){
+        incrementer_->countArgs(tmpIncrementer);
+    }
+    if(statement_!=nullptr){
+        statement_->countArgs(tmpStatement);
+    }
+
+    count = std::max(tmpNextBlock,std::max(tmpCondition, std::max(tmpStatement, std::max(tmpInitializer, tmpIncrementer))));
+
+}
+
+
+
 // *********** JUMP STATEMENT CLASS ************ //
 
 
@@ -418,7 +518,7 @@ Bindings ReturnStatement::printASM(Bindings bindings){
     if(expression_!=nullptr){
         expression_->printASM(bindings);
     }
-    output << "j end" << std::endl << "nop" << std::endl;
+    output << "j $" << bindings.getFunctionEndLabel() << "end" << std::endl << "nop" << std::endl;
     return bindings;
 }
 
@@ -439,6 +539,19 @@ void ReturnStatement::countTemps(int &count){
 
     count = std::max(tmpNextBlock,tmpExpression);
 }
+
+void ReturnStatement::countArgs(int &count){
+    int tmpNextBlock = 0, tmpExpression = 0;
+    if(nextBlock_!=nullptr){
+        nextBlock_->countArgs(tmpNextBlock);
+    }
+    if(expression_!=nullptr){
+        expression_->countArgs(tmpExpression);
+    }
+
+    count = std::max(tmpNextBlock,tmpExpression);   
+}
+
 
 
 // *********** BREAK STATEMENT CLASS ************ //
@@ -473,6 +586,13 @@ void BreakStatement::countTemps(int &count){
     }
 }
 
+void BreakStatement::countArgs(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(count);
+    }
+}
+
+
 
 // *********** CONTINUE STATEMENT CLASS ************ //
 
@@ -500,6 +620,12 @@ void ContinueStatement::countVariables(int &count){
 }
 
 void ContinueStatement::countTemps(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(count);
+    }
+}
+
+void ContinueStatement::countArgs(int &count){
     if(nextBlock_!=nullptr){
         nextBlock_->countTemps(count);
     }

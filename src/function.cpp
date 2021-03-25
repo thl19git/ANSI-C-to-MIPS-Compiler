@@ -12,13 +12,22 @@ void Function::print(){
 
 Bindings Function::printASM(Bindings bindings){
     Bindings initialBindings = bindings;
+
+    int endLabel = labelCount++;
+    bindings.setFunctionEndLabel(endLabel);
     
     int variables = 0;
     statement_->countVariables(variables);
     int temporaries = 0;
     statement_->countTemps(temporaries);
+    int args = 0;
+    statement_->countArgs(args);
 
-    int stackSize = 4*(variables+temporaries+2); //add 2 for ra and padding
+    if(args>=1 && args <=4){
+        args = 4;
+    }
+
+    int stackSize = 4*(args+variables+temporaries+2); //add 2 for ra and padding
 
     if(stackSize%8) stackSize+= 4; //stack must be 8-byte aligned, padding at end of data section
 
@@ -26,9 +35,9 @@ Bindings Function::printASM(Bindings bindings){
 
         return address
         frame pointer
-        possible padding
         variables/temporaries
-        arguments for function calls (to be added later)
+        possible padding
+        arguments for function calls
 
     */
 
@@ -52,10 +61,10 @@ Bindings Function::printASM(Bindings bindings){
     output << "move $fp,$sp" << std::endl;
 
     //set stack pointer in bindings for variables
-    bindings.setStackPos(0); //as no function calls with args yet
+    bindings.setStackPos(args*4);
 
     //set stack pointer in bindings for temporaries
-    bindings.setTempPos(variables*4);
+    bindings.setTempPos((args+variables)*4);
 
     //print assembly of the parameters
     if(parameter_!=nullptr){
@@ -70,7 +79,7 @@ Bindings Function::printASM(Bindings bindings){
     output << "move $2,$0" <<std::endl;
 
     //label for function end
-    output << "end:" << std::endl;
+    output << "$" << endLabel << "end:" << std::endl;
 
     //move frame pointer into stack pointer
     output << "move $sp,$fp" << std::endl;
