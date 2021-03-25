@@ -22,7 +22,7 @@ Bindings Function::printASM(Bindings bindings){
     statement_->countTemps(temporaries);
     int args = 0;
     statement_->countArgs(args);
-
+    
     if(args>=1 && args <=4){
         args = 4;
     }

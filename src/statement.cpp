@@ -588,7 +588,7 @@ void BreakStatement::countTemps(int &count){
 
 void BreakStatement::countArgs(int &count){
     if(nextBlock_!=nullptr){
-        nextBlock_->countTemps(count);
+        nextBlock_->countArgs(count);
     }
 }
 
@@ -627,6 +627,6 @@ void ContinueStatement::countTemps(int &count){
 
 void ContinueStatement::countArgs(int &count){
     if(nextBlock_!=nullptr){
-        nextBlock_->countTemps(count);
+        nextBlock_->countArgs(count);
     }
 }

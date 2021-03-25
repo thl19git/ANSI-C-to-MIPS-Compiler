@@ -90,10 +90,10 @@ void IdentifierDeclaration::countTemps(int &count){
 void IdentifierDeclaration::countArgs(int &count){
     int tmpNextBlock = 0, tmpInit = 0;
     if(nextBlock_!=nullptr){
-        nextBlock_->countTemps(tmpNextBlock);
+        nextBlock_->countArgs(tmpNextBlock);
     }
     if(initializer_!=nullptr){
-        initializer_->countTemps(tmpInit);
+        initializer_->countArgs(tmpInit);
     }
 
     count = std::max(tmpNextBlock,tmpInit);

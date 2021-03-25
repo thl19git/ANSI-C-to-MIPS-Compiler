@@ -45,7 +45,7 @@ void BinaryExpression::countTemps(int &count){
     int tmpLeft = 0, tmpRight = 0;
     left_->countTemps(tmpLeft);
     right_->countTemps(tmpRight);
-    count = tmpLeft + tmpRight + 1;
+    count = tmpLeft + tmpRight;
 }
 
 void BinaryExpression::countArgs(int &count){
@@ -472,7 +472,7 @@ Bindings UnaryOpExpression::printASM(Bindings bindings){
 void UnaryOpExpression::countTemps(int &count){
     int tmp = 0;
     unaryExpression_->countTemps(tmp);
-    count = tmp+1;
+    count = tmp;
 }
 
 void UnaryOpExpression::countArgs(int &count){
@@ -504,7 +504,7 @@ Bindings PostfixExpression::printASM(Bindings bindings){
 void PostfixExpression::countTemps(int &count){
     int tmp = 0;
     postfixExpression_->countTemps(tmp);
-    count = tmp+1;
+    count = tmp;
 }
 
 void PostfixExpression::countArgs(int &count){

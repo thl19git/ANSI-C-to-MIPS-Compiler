@@ -41,10 +41,10 @@ Here is a list of intermediate features that you might like to implement once th
 7. files containing multiple functions that call each other - done
 8. functions that take up to four parameters - done
 9. for loops - done
-10. arrays declared globally (i.e. outside of any function in your file) - maybe try this if we have time?
+10. arrays declared globally (i.e. outside of any function in your file) - maybe try this if we have time? probably not
 11. arrays declared locally (i.e. inside a function) - TODO
 12. reading and writing elements of an array - TODO
-13. recursive function calls - probably supported (untested)
+13. recursive function calls - done
 14. the `enum` keyword - TODO
 15. `switch` statements - TODO
 16. the `break` and `continue` keywords - done
@@ -54,7 +54,7 @@ Here is a list of more advanced features like you might like to implement once t
 17. variables of `double`, `float`, `char`, `unsigned`, structs, and pointer types - probably avoid
 18. calling externally-defined functions (i.e. the file being compiled declares a function, but its definition is provided in a different file that is linked in later on) - done
 19. functions that take more than four parameters - done
-20. mutually recursive function calls - probably supported (untested)
+20. mutually recursive function calls - done
 21. locally scoped variable declarations (e.g. a variable that is declared inside the body of a while loop, such as `while(...) { int x = ...; ... }`. - done except repeated names both in scope
 22. the `typedef` keyword - maybe do?
 23. the `sizeof(...)` function (which takes either a type or a variable) - maybe do?
