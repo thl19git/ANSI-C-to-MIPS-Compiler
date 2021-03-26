@@ -2,8 +2,8 @@
 
 // *********** BASIC DECLARATION CLASS ************ //
 
-Declaration::Declaration(ExpressionPtr initializer) : initializer_(initializer) {
-
+Declaration::Declaration(){
+    //Do nothing
 }
 
 void Declaration::linkDeclaration(DeclarationPtr declaration){
@@ -19,13 +19,13 @@ DeclarationPtr Declaration::getNext(){
 }
 
 void Declaration::setInitializer(ExpressionPtr initializer){
-    initializer_ = initializer;
+    //do nothing
 }
 
 
 // *********** IDENTIFIER DECLARATION CLASS ************ //
 
-IdentifierDeclaration::IdentifierDeclaration(std::string id, ExpressionPtr initializer) : Declaration(initializer), id_(id){
+IdentifierDeclaration::IdentifierDeclaration(std::string id, ExpressionPtr initializer) : id_(id), initializer_(initializer){
 
 }
 
@@ -97,4 +97,59 @@ void IdentifierDeclaration::countArgs(int &count){
     }
 
     count = std::max(tmpNextBlock,tmpInit);
+}
+
+void IdentifierDeclaration::setInitializer(ExpressionPtr initializer){
+    initializer_ = initializer;
+}
+
+
+// *********** ARRAY DECLARATION CLASS ************ //
+
+ArrayDeclaration::ArrayDeclaration(std::string id, int size) : id_(id), size_(size){
+
+}
+
+void ArrayDeclaration::print(){
+    if(nextBlock_!=nullptr){
+        nextBlock_->print();
+    }
+    if(nextDeclaration_!=nullptr){
+        nextDeclaration_->print();
+    }
+    std::cout << "array declaration" << std::endl;
+}
+
+Bindings ArrayDeclaration::printASM(Bindings bindings){
+    if(nextBlock_!=nullptr){
+        bindings = nextBlock_->printASM(bindings);
+    }
+
+    //insert array name at index 0 in bindings
+    bindings.insertBindings(id_, type_);
+    bindings.increaseStackPos(4*size_);
+    return bindings;
+}
+
+std::string ArrayDeclaration::getId(){
+    return id_;
+}
+
+void ArrayDeclaration::countVariables(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countVariables(count);
+    }
+    count+= size_*4;
+}
+
+void ArrayDeclaration::countTemps(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countTemps(count);
+    }
+}
+
+void ArrayDeclaration::countArgs(int &count){
+    if(nextBlock_!=nullptr){
+        nextBlock_->countArgs(count);
+    }
 }

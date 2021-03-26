@@ -147,6 +147,7 @@ Declarator:             // e.g. a || sum
 DirectDeclarator:       // e.g. a || sum
                         T_IDENTIFIER {$$ = new IdentifierDeclaration(*$1,NULL);/* std::cerr << "direct declarator = identifer "<< *$1 << std::endl;*/} //some uninitialized value is created here
                         | T_LB Declarator T_RB {$$ = $2;/* std::cerr << "direct declarator = (declarator)" << std::endl;*/}
+                        | DirectDeclarator T_LSB T_INT_CONST T_RSB {$$ = new ArrayDeclaration($1->getId(),$3);}
                         ;
  
 Initializer:            // e.g. a || b = 2
@@ -348,6 +349,7 @@ PostfixExpression:      // e.g. a++
                         PrimaryExpression {$$ = $1;/* std::cerr << "postfix expression = primary expression" << std::endl;*/}
                         | PostfixExpression T_INC_OP {$$ = new PostfixExpression("++",$1);/* std::cerr <<"increment operation";*/}
                         | PostfixExpression T_DEC_OP {$$ = new PostfixExpression("--",$1);/* std::cerr <<"increment operation";*/}
+                        | PostfixExpression T_LSB ConditionalExpression T_RSB {$$ = new ArrayExpression($1->getId(),$3);}
                         ;
 
 AssignmentOperator:     // e.g +=

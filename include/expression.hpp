@@ -16,6 +16,7 @@ typedef Expression* ExpressionPtr;
 class Expression : public Node {
 protected:
     ExpressionPtr nextExpression_; //only required for initializer lists which we aren't tested on
+    bool isArray_ = false;
 public:
     virtual void print() = 0;
     virtual Bindings printASM(Bindings bindings) = 0;
@@ -24,6 +25,8 @@ public:
     virtual void countTemps(int &count) = 0;
     virtual std::string getId();
     virtual void countArgs(int &count) = 0;
+    bool isArray();
+    virtual Bindings printArrayASM(Bindings bindings);
 };
 
 
@@ -296,5 +299,23 @@ public:
     virtual void countTemps(int &count);
     virtual void countArgs(int &count);
 };
+
+
+// *********** ARRAY EXPRESSION CLASS ************ //
+
+class ArrayExpression : public UnaryExpression {
+protected:
+    std::string id_;
+    ExpressionPtr index_;
+
+public:
+    ArrayExpression(std::string id, ExpressionPtr index);
+    virtual void print();
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
+    virtual Bindings printArrayASM(Bindings bindings);
+};
+
 
 #endif
