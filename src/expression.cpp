@@ -320,6 +320,12 @@ void LogicalOrExpression::print(){
 
 Bindings LogicalOrExpression::printASM(Bindings bindings){
     //TODO - requires a bit more thought
+	load(bindings);
+	output << "or $2,$2,$3" << std::endl;	
+	output << "slt $8,$2,$0" << std::endl;
+	output << "slt $9,$0,$2" << std::endl;
+	output << "add $2,$8,$9" << std::endl;
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
     return bindings;
 }
 
@@ -342,7 +348,17 @@ void LogicalAndExpression::print(){
 
 Bindings LogicalAndExpression::printASM(Bindings bindings){
     //TODO - requires a bit more thought
-    return bindings;
+    load(bindings);
+	output << "slt $8,$2,$0" << std::endl;
+	output << "slt $9,$0,$2" << std::endl;
+	output << "add $8,$8,$9" << std::endl;
+	output << "slt $9,$3,$0" << std::endl;
+	output << "slt $10,$0,$3" << std::endl;
+	output << "add $9,$9,$10" << std::endl;
+	output << "and $2,$8,$9" << std::endl;
+	output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+	
+	return bindings;
 }
 
 
@@ -456,7 +472,21 @@ Bindings UnaryOpExpression::printASM(Bindings bindings){
     if(op_ == "++"){
         output<<"addi $2,$2,1"<<std::endl;
         output<<"sw $2,"<< bindings.getStackPos(unaryExpression_->getId())<< "($fp)" <<std::endl;
+    }else if(op_ == "--"){
+        output<<"addi $2,$2,-1"<<std::endl;
+        output<<"sw $2,"<< bindings.getStackPos(unaryExpression_->getId())<< "($fp)" <<std::endl;
+    }else if(op_ == "-"){
+        output<<"nor $2,$2,$0"<<std::endl;
+		output<<"addi $2,$2,1"<<std::endl;
+    }else if(op_ == "!"){
+        output<<"slt $8,$2,$0"<<std::endl;
+		output<<"slt $9,$0,$2"<<std::endl;
+		output<<"nor $2,$8,$9"<<std::endl;	
+		output<<"andi $2,$2,1"<<std::endl;
+    }else if(op_ == "~"){
+		output<<"nor $2,$2,$0"<<std::endl;
     }
+	
     //store result on the stack
     output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
     return bindings;
