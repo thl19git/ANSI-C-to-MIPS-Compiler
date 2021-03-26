@@ -42,8 +42,8 @@ Here is a list of intermediate features that you might like to implement once th
 8. functions that take up to four parameters - done
 9. for loops - done
 10. arrays declared globally (i.e. outside of any function in your file) - maybe try this if we have time? probably not
-11. arrays declared locally (i.e. inside a function) - TODO
-12. reading and writing elements of an array - TODO
+11. arrays declared locally (i.e. inside a function) - done
+12. reading and writing elements of an array - done
 13. recursive function calls - done
 14. the `enum` keyword - TODO
 15. `switch` statements - TODO
