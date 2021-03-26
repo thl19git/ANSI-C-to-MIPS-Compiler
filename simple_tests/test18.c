@@ -12,7 +12,7 @@ int f(int a, int b, int c, int d, int e){
 
     c += a * b;
 
-    for(int i = 0; i < 10; i+=1){
+    for(int i = 0; i < 10; i++){
         d += c;
     }
  

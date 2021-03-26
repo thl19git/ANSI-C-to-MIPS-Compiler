@@ -24,6 +24,7 @@ public:
     virtual Bindings printASM(Bindings bindings) = 0;
     virtual void countVariables(int &count) = 0;
     virtual void countTemps(int &count) = 0;
+    virtual void countArgs(int &count) = 0;
 };
 
 
@@ -39,6 +40,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 
 };
 
@@ -55,6 +57,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 
 };
 
@@ -73,6 +76,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -89,6 +93,7 @@ public:
     virtual Bindings printASM(Bindings bindings) = 0;
     virtual void countVariables(int &count) = 0;
     virtual void countTemps(int &count) = 0;
+    virtual void countArgs(int &count) = 0;
 };
 
 
@@ -103,6 +108,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -119,6 +125,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -135,6 +142,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -149,7 +157,7 @@ public:
     virtual Bindings printASM(Bindings bindings) = 0;
     virtual void countVariables(int &count) = 0;
     virtual void countTemps(int &count) = 0;
-
+    virtual void countArgs(int &count) = 0;
 };
 
 
@@ -165,6 +173,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -179,6 +188,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -193,5 +203,6 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countVariables(int &count);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 #endif

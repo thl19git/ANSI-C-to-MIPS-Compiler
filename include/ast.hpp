@@ -11,5 +11,6 @@
 #include "block_item.hpp"
 #include "bindings.hpp"
 #include "parameter.hpp"
+#include "inputparameter.hpp"
 
 #endif

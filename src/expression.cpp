@@ -14,6 +14,14 @@ std::string Expression::getId(){
     return "";
 }
 
+bool Expression::isArray(){
+    return isArray_;
+}
+
+Bindings Expression::printArrayASM(Bindings bindings){
+    return bindings;
+}
+
 
 // *********** BINARY EXPRESSION CLASS ************ //
 
@@ -45,7 +53,14 @@ void BinaryExpression::countTemps(int &count){
     int tmpLeft = 0, tmpRight = 0;
     left_->countTemps(tmpLeft);
     right_->countTemps(tmpRight);
-    count = tmpLeft + tmpRight + 1;
+    count = tmpLeft + tmpRight;
+}
+
+void BinaryExpression::countArgs(int &count){
+    int tmpLeft = 0, tmpRight = 0;
+    left_->countArgs(tmpLeft);
+    right_->countArgs(tmpRight);
+    count = std::max(tmpLeft,tmpRight);
 }
 
 
@@ -82,21 +97,41 @@ void AssignmentExpression::print(){
 }
 
 Bindings AssignmentExpression::printASM(Bindings bindings){
-    //print assembly for right-hand side, result should be in $2 and on stack
-    right_->printASM(bindings);
+    
+    if(!left_->isArray()){ 
+        //print assembly for right-hand side, result should be in $2 and on stack
+        right_->printASM(bindings);
 
-    //increase temp stack position
-    bindings.nextTempPos();
+        //increase temp stack position
+        bindings.nextTempPos();
 
-    //get left-hand side id
-    std::string leftId = left_->getId();
+        //get left-hand side id
+        std::string leftId = left_->getId();
 
-    //get stack location of left-hand side variable
-    int leftStackPos = bindings.getStackPos(leftId);
+        //get stack location of left-hand side variable
+        int leftStackPos = bindings.getStackPos(leftId);
 
-    //store $2 in location of left-hand side
-    output << "sw $2," << leftStackPos << "($fp)" << std::endl;
+        //store $2 in location of left-hand side
+        output << "sw $2," << leftStackPos << "($fp)" << std::endl;
+    } else {
+        //gets the right-hand side into $2 and on the stack
+        right_->printASM(bindings);
+        int rightpos = bindings.getTempPos();
 
+        //increase temp stack position
+        bindings.nextTempPos();
+
+        //gets the required address into $2
+        left_->printArrayASM(bindings);
+
+        //get right-hand side into $3
+        output << "lw $3," << rightpos << "($fp)" << std::endl;
+        output << "nop" << std::endl;
+
+        //store $3 in address given by $2
+        output << "sw $3,0($2)" << std::endl;
+
+    }
     return bindings;
 
 }
@@ -495,7 +530,13 @@ Bindings UnaryOpExpression::printASM(Bindings bindings){
 void UnaryOpExpression::countTemps(int &count){
     int tmp = 0;
     unaryExpression_->countTemps(tmp);
-    count = tmp+1;
+    count = tmp;
+}
+
+void UnaryOpExpression::countArgs(int &count){
+    int tmp = 0;
+    unaryExpression_->countArgs(tmp);
+    count = tmp;
 }
 
 
@@ -514,14 +555,51 @@ void PostfixExpression::print(){
 }
 
 Bindings PostfixExpression::printASM(Bindings bindings){
-    //TODO
+    if(!postfixExpression_->isArray()){
+        //get the expression into $2
+        postfixExpression_->printASM(bindings);
+        //store the result on the stack
+        output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+        //add/sub one
+        if(op_=="++"){
+            output << "addi $2,$2,1" << std::endl;
+        } else if(op_=="--"){
+            output << "addiu $2,$2,-1" << std::endl;
+        }
+        //store the result back on stack
+        output << "sw $2," << bindings.getStackPos(postfixExpression_->getId()) << "($fp)" << std::endl;
+        //restore the previous value into $2
+        output << "lw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+    } else {
+        //get array address into $2
+        postfixExpression_->printArrayASM(bindings);
+        //load value into $3
+        output << "lw $3,0($2)" << std::endl;
+        //store in a temporary
+        output << "sw $3," << bindings.getTempPos() << "($fp)" << std::endl;
+        if(op_=="++"){
+            output << "addi $3,$3,1" << std::endl;
+        } else if(op_=="--"){
+            output << "addiu $3,$3,-1" << std::endl;
+        }
+        //store the result back on stack
+        output << "sw $3,0($2)" << std::endl;
+        //restore the previous value into $2
+        output << "lw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+    }
     return bindings;
 }
 
 void PostfixExpression::countTemps(int &count){
     int tmp = 0;
     postfixExpression_->countTemps(tmp);
-    count = tmp+1;
+    count = tmp;
+}
+
+void PostfixExpression::countArgs(int &count){
+    int tmp = 0;
+    postfixExpression_->countArgs(tmp);
+    count = tmp;
 }
 
 
@@ -558,6 +636,10 @@ std::string Identifier::getId(){
     return id_;
 }
 
+void Identifier::countArgs(int &count){
+    count = 0;
+}
+
 
 // *********** CONSTANT CLASS ************ //
 
@@ -587,6 +669,9 @@ void Constant::countTemps(int &count){
     count = 1;
 }
 
+void Constant::countArgs(int &count){
+    count = 0;
+}
 
 // *********** INITIALIZER CLASS ************ //
 //possibly useless (as in not assessed)//
@@ -612,4 +697,110 @@ ExpressionPtr Initializer::getNext(){
 
 void Initializer::countTemps(int &count){
     count = 1; //not entirely sure what to do here
+}
+
+void Initializer::countArgs(int &count){
+    count = 0; //not entirely sure what to do here
+}
+
+
+// *********** FUNCTION CALL CLASS ************ //
+
+FunctionCall::FunctionCall(std::string id, InputParameterPtr params) : id_(id), parameters_(params) {
+
+}
+
+void FunctionCall::print(){
+    std::cout << "function call" << std::endl;
+}
+
+Bindings FunctionCall::printASM(Bindings bindings){
+
+    Bindings initialBindings = bindings;
+
+    //count number of parameters
+    int params = 0;
+    if(parameters_!=nullptr){
+        params = parameters_->countParams();
+    }
+    
+    //print assembly for parameters (put on stack / in registers)
+    if(params>0){
+        parameters_->printParameterASM(bindings, params);
+    }
+    
+    //jump to the function
+    output << "jal " << id_ << std::endl;
+    output << "nop" << std::endl;
+
+    //result should now be in $2, so store on stack in temporary
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return initialBindings;
+}
+
+void FunctionCall::countTemps(int &count){
+    int tmpcount = 0;
+    if(parameters_!=nullptr){
+        parameters_->countTemps(tmpcount);
+    }
+    count = tmpcount + 1;
+}
+
+void FunctionCall::countArgs(int &count){
+    if(parameters_!=nullptr){
+        count = parameters_->countParams();
+    } else {
+        count = 0;
+    }
+}
+
+// *********** ARRAY EXPRESSION CLASS ************ //
+
+ArrayExpression::ArrayExpression(std::string id, ExpressionPtr index) : id_(id), index_(index){
+    isArray_ = true;
+}
+
+void ArrayExpression::print(){
+    std::cout << "array expression" << std::endl;
+}
+
+Bindings ArrayExpression::printASM(Bindings bindings){
+
+    //get correct address into $2
+    printArrayASM(bindings);
+    //load value at address $2 into $2
+    output << "lw $2,0($2)" << std::endl;
+    output << "nop" << std::endl;
+    //store $2 on the stack (temporary)
+    output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+
+    return bindings;
+}
+
+void ArrayExpression::countTemps(int &count){
+    int tmp = 0;
+    index_->countTemps(tmp);
+    count = tmp;
+}
+
+void ArrayExpression::countArgs(int &count){
+    int tmp = 0;
+    index_->countArgs(tmp);
+    count = tmp;
+}
+
+Bindings ArrayExpression::printArrayASM(Bindings bindings){
+    //Evaluate index expression into $2
+    index_->printASM(bindings);
+    //Shift $2 left twice (multiply by 4)
+    output << "sll $2,$2,2" << std::endl;
+    //Get stack address
+    int pos = bindings.getStackPos(id_);
+    //$3 = $fp + stack address
+    output << "addiu $3,$fp," << pos << std::endl;
+    //$2 = $2 + $3 ($2 is now the correct address)
+    output << "addu $2,$3,$2" << std::endl;
+
+    return bindings;
 }

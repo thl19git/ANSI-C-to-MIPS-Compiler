@@ -4,8 +4,11 @@
 #include "node.hpp"
 #include <string>
 #include "bindings.hpp"
+#include "inputparameter.hpp"
 
 class Expression;
+class InputParameter;
+typedef InputParameter* InputParameterPtr;
 typedef Expression* ExpressionPtr;
 
 // *********** BASIC EXPRESSION CLASS ************ //
@@ -13,6 +16,7 @@ typedef Expression* ExpressionPtr;
 class Expression : public Node {
 protected:
     ExpressionPtr nextExpression_; //only required for initializer lists which we aren't tested on
+    bool isArray_ = false;
 public:
     virtual void print() = 0;
     virtual Bindings printASM(Bindings bindings) = 0;
@@ -20,6 +24,9 @@ public:
     ExpressionPtr getNext();
     virtual void countTemps(int &count) = 0;
     virtual std::string getId();
+    virtual void countArgs(int &count) = 0;
+    bool isArray();
+    virtual Bindings printArrayASM(Bindings bindings);
 };
 
 
@@ -36,6 +43,7 @@ public:
     virtual Bindings printASM(Bindings bindings) = 0;
     virtual void countTemps(int &count);
     void load(Bindings bindings);
+    virtual void countArgs(int &count);
 };
 
 
@@ -49,6 +57,7 @@ public:
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count) = 0;
+    virtual void countArgs(int &count) = 0;
 };
 
 
@@ -210,6 +219,7 @@ public:
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -225,6 +235,7 @@ public:
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -240,6 +251,7 @@ public:
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count);
     virtual std::string getId();
+    virtual void countArgs(int &count);
 };
 
 
@@ -254,6 +266,7 @@ public:
     virtual void print();
     virtual Bindings printASM(Bindings bindings);
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
 
 
@@ -269,6 +282,40 @@ public:
     virtual Bindings printASM(Bindings bindings);
     ExpressionPtr getNext();
     virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
 };
+
+// *********** FUNCTION CALL CLASS ************ //
+
+class FunctionCall : public Expression {
+protected:
+    std::string id_;
+    InputParameterPtr parameters_;
+
+public:
+    FunctionCall(std::string id, InputParameterPtr params = nullptr);
+    virtual void print();
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
+};
+
+
+// *********** ARRAY EXPRESSION CLASS ************ //
+
+class ArrayExpression : public UnaryExpression {
+protected:
+    std::string id_;
+    ExpressionPtr index_;
+
+public:
+    ArrayExpression(std::string id, ExpressionPtr index);
+    virtual void print();
+    virtual Bindings printASM(Bindings bindings);
+    virtual void countTemps(int &count);
+    virtual void countArgs(int &count);
+    virtual Bindings printArrayASM(Bindings bindings);
+};
+
 
 #endif

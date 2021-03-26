@@ -21,6 +21,7 @@
   Declaration* declaration;
   BlockItem* block;
   Parameter* parameter;
+  InputParameter* inputParam;
 }
 
 %define parse.error verbose
@@ -44,9 +45,11 @@
 
 %type <transunit> TranslationUnit
 
-%type <function> FunctionDefinition
+%type <function> FunctionDefinition FunctionDeclaration
 
 %type <parameter> Parameter ParameterList BracketedParameterList
+
+%type <inputParam> InputParameter InputParameterList WrappedInputParameters
 
 %type <block> BlockItem BlockItemList
 
@@ -66,9 +69,13 @@ ROOT:                   TranslationUnit {g_root = $1;/* std::cerr << "root = tra
                         ;
 
 TranslationUnit:        // e.g. int foo() {...}
-                        FunctionDefinition {$$ = new TranslationUnit($1);/* std::cerr << "translationunit = function definition" << std::endl;*/}
-                        | TranslationUnit FunctionDefinition {$$->append($2);/*  std::cerr << "adding function definition to translationunit" << std::endl;*/}
+                        FunctionDeclaration {$$ = new TranslationUnit($1);/* std::cerr << "translationunit = function definition" << std::endl;*/}
+                        | TranslationUnit FunctionDeclaration {$$->append($2);/*  std::cerr << "adding function definition to translationunit" << std::endl;*/}
                         ;
+
+FunctionDeclaration:    // e.g. int foo(){...} || int foo();
+                        FunctionDefinition {$$ = $1;}
+                        | TypeSpecifier Declarator BracketedParameterList T_SEMICOLON {$$ = nullptr;}
                 
 FunctionDefinition:     // e.g. int foo() {...}
                         TypeSpecifier Declarator BracketedParameterList CompoundStatement { if($4!=nullptr){
@@ -140,7 +147,7 @@ Declarator:             // e.g. a || sum
 DirectDeclarator:       // e.g. a || sum
                         T_IDENTIFIER {$$ = new IdentifierDeclaration(*$1,NULL);/* std::cerr << "direct declarator = identifer "<< *$1 << std::endl;*/} //some uninitialized value is created here
                         | T_LB Declarator T_RB {$$ = $2;/* std::cerr << "direct declarator = (declarator)" << std::endl;*/}
-                        //| DirectDeclarator T_LB T_RB {$$ = $1;/*  std::cerr << "direct declarator = direct declarator ()" << std::endl;*/}
+                        | DirectDeclarator T_LSB T_INT_CONST T_RSB {$$ = new ArrayDeclaration($1->getId(),$3);}
                         ;
  
 Initializer:            // e.g. a || b = 2
@@ -321,13 +328,28 @@ PrimaryExpression:      // e.g. a || 4 || ()
                         T_IDENTIFIER {$$ = new Identifier(*$1);/* std::cerr << "identifier" << std::endl;*/}
                         | T_INT_CONST {$$ = new Constant($1);/* std::cerr << "integer constant " << $1 << std::endl;*/}
                         | T_LB Expression T_RB {$$ = $2;/* std::cerr << "Expression in brackets" << std::endl;*/}
+                        | T_IDENTIFIER WrappedInputParameters { $$ = new FunctionCall(*$1,$2);}
                         ;
-                        
+
+WrappedInputParameters: //e.g. (1,2) || ()
+                        T_LB T_RB {$$ = nullptr;}
+                        | T_LB InputParameterList T_RB {$$ = $2;}
+                        ;
+
+InputParameterList:     //e.g x,y || 1,3
+                        InputParameter {$$ = $1;}
+                        | InputParameterList T_COMMA InputParameter {$3->linkInputParameter($$); $$ = $3;}
+                        ;
+
+InputParameter:         // e.g. x || 3
+                        ConditionalExpression {$$ = new InputParameter($1);}
+                        ;
 
 PostfixExpression:      // e.g. a++
                         PrimaryExpression {$$ = $1;/* std::cerr << "postfix expression = primary expression" << std::endl;*/}
                         | PostfixExpression T_INC_OP {$$ = new PostfixExpression("++",$1);/* std::cerr <<"increment operation";*/}
                         | PostfixExpression T_DEC_OP {$$ = new PostfixExpression("--",$1);/* std::cerr <<"increment operation";*/}
+                        | PostfixExpression T_LSB ConditionalExpression T_RSB {$$ = new ArrayExpression($1->getId(),$3);}
                         ;
 
 AssignmentOperator:     // e.g +=

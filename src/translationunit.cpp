@@ -12,7 +12,9 @@ void TranslationUnit::print(){
 
 Bindings TranslationUnit::printASM(Bindings bindings){
     for(unsigned i = 0; i < nodes_.size(); i++){
-        bindings = nodes_[i]->printASM(bindings);
+        if(nodes_[i]!=nullptr){
+            bindings = nodes_[i]->printASM(bindings);
+        }
     }
     return bindings;
 }
