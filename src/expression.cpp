@@ -525,7 +525,38 @@ void PostfixExpression::print(){
 }
 
 Bindings PostfixExpression::printASM(Bindings bindings){
-    //TODO
+    if(!postfixExpression_->isArray()){
+        //get the expression into $2
+        postfixExpression_->printASM(bindings);
+        //store the result on the stack
+        output << "sw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+        //add/sub one
+        if(op_=="++"){
+            output << "addi $2,$2,1" << std::endl;
+        } else if(op_=="--"){
+            output << "addiu $2,$2,-1" << std::endl;
+        }
+        //store the result back on stack
+        output << "sw $2," << bindings.getStackPos(postfixExpression_->getId()) << "($fp)" << std::endl;
+        //restore the previous value into $2
+        output << "lw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+    } else {
+        //get array address into $2
+        postfixExpression_->printArrayASM(bindings);
+        //load value into $3
+        output << "lw $3,0($2)" << std::endl;
+        //store in a temporary
+        output << "sw $3," << bindings.getTempPos() << "($fp)" << std::endl;
+        if(op_=="++"){
+            output << "addi $3,$3,1" << std::endl;
+        } else if(op_=="--"){
+            output << "addiu $3,$3,-1" << std::endl;
+        }
+        //store the result back on stack
+        output << "sw $3,0($2)" << std::endl;
+        //restore the previous value into $2
+        output << "lw $2," << bindings.getTempPos() << "($fp)" << std::endl;
+    }
     return bindings;
 }
 

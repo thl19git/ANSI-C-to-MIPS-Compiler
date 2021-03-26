@@ -139,7 +139,7 @@ void ArrayDeclaration::countVariables(int &count){
     if(nextBlock_!=nullptr){
         nextBlock_->countVariables(count);
     }
-    count+= size_*4;
+    count+= size_;
 }
 
 void ArrayDeclaration::countTemps(int &count){
